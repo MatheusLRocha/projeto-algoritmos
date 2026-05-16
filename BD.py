@@ -18,22 +18,15 @@ cursor.execute("""CREATE TABLE IF NOT EXISTS login (
                email VARCHAR(100) NOT NULL UNIQUE,
                senha_login BLOB 
                );""")
-cursor.execute("""  CREATE TABLE IF NOT EXISTS bloco_senha (
+cursor.execute("""  CREATE TABLE IF NOT EXISTS bloco (
                id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                titulo VARCHAR(100),
                senha_bloco BLOB,
                anotacoes TEXT,
+               id_usuario INTERGER NOT NULL,
                FOREIGN KEY (id_usuario) REFERENCES login(id)
                );""")
 
-cursor.execute("""INSERT INTO login (nome, email, senha_login) values (?,?,?)""",(nome, email, senha_login))
-cursor.execute("""INSERT INTO bloco_senha (titulo, senha_bloco, anotacoes) values (?,?,?)""",(titulo, senha_bloco, anotacoes))
-
-conn.commit()
-
-print(f"Usuário {nome} cadastrado com sucesso")
-
-conn.close()
 #OBS: exemplo de como responder a erros sem fechar o programa
 # try:
 #     cursor.execute("""INSERT INTO login (nome,email) values (?,?)""",(nome, email))
