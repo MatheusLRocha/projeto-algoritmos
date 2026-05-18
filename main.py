@@ -33,6 +33,10 @@ class GerenciadorDeSenhas:
         with open('salt.txt', 'wb') as f:
             f.write(salt)
 
+        with open('autenticacao.txt', 'w') as f:
+            texto_cofre = self.fernet.encrypt(b'Cofre criado')
+            f.write(texto_cofre.decode() + '\n')
+
         self.isLogged = True
 
     # Verifica se o usuário tem uma conta
@@ -43,22 +47,24 @@ class GerenciadorDeSenhas:
         key = self.gerar_chave(senha_mestra, salt)
         self.fernet = Fernet(key)
 
-        with open('senhas.txt', 'r') as f:
-            site_criptografado, senha_criptografada = f.readline().split(':')
+        with open('autenticacao.txt', 'r') as f:
+            dados_criptografados = f.readline()
 
         try:
-            site_descriptografado = self.fernet.decrypt(site_criptografado.encode())
-            senha_descriptografada = self.fernet.decrypt(senha_criptografada.encode())
+            dados_descriptografados = self.fernet.decrypt(dados_criptografados.encode())
 
             self.isLogged = True
 
             print('Login feito com sucesso!')
 
-            with open('senhas.txt', 'r') as f:
-                for line in f:
-                    key, value = line.split(':')
+            try:
+                with open('senhas.txt', 'r') as f:
+                    for line in f:
+                        key, value = line.split(':')
 
-                    self.senhas[self.fernet.decrypt(key).decode()] = self.fernet.decrypt(value).decode()
+                        self.senhas[self.fernet.decrypt(key).decode()] = self.fernet.decrypt(value).decode()
+            except:
+                print('Ainda não há senhas no cofre')
         except:
             print('Login negado')
 
