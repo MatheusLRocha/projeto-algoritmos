@@ -36,22 +36,29 @@ class GerenciadorDeSenhas:
         self.isLogged = True
 
     # Verifica se o usuário tem uma conta
-    def login_conta(self, senha):
+    def login_conta(self, senha_mestra):
         with open('salt.txt', 'rb') as f:
             salt = f.read()
 
-        key = self.gerar_chave(senha, salt)
+        key = self.gerar_chave(senha_mestra, salt)
         self.fernet = Fernet(key)
 
         with open('senhas.txt', 'r') as f:
-            for line in f:
-                site, senha_criptografada = line.split(':')
+            site_criptografado, senha_criptografada = f.readline().split(':')
 
         try:
-            senha_decifrada = self.fernet.decrypt(senha_criptografada.encode())
+            site_descriptografado = self.fernet.decrypt(site_criptografado.encode())
+            senha_descriptografada = self.fernet.decrypt(senha_criptografada.encode())
 
             self.isLogged = True
-            print('Login feito')
+
+            print('Login feito com sucesso!')
+
+            with open('senhas.txt', 'r') as f:
+                for line in f:
+                    key, value = line.split(':')
+
+                    self.senhas[self.fernet.decrypt(key).decode()] = self.fernet.decrypt(value).decode()
         except:
             print('Login negado')
 
@@ -66,7 +73,7 @@ class GerenciadorDeSenhas:
                 with open('senhas.txt', 'r') as f:
                     for line in f:
                         site, senha = line.split(':')
-                        print(site + ' - ' + self.fernet.decrypt(senha.encode()).decode())
+                        print(self.fernet.decrypt(site.encode()).decode() + ' - ' + self.fernet.decrypt(senha.encode()).decode())
             else:
                 print('Você não possui acesso, verifique seu login')
         except:
@@ -76,9 +83,10 @@ class GerenciadorDeSenhas:
     # Permite criar uma senha nova se estiver logado
     def criar_nova_senha(self, site, password):
         if self.isLogged:
+            encrypted_site = self.fernet.encrypt(site.encode())
             encrypted_password = self.fernet.encrypt(password.encode())
             with open('senhas.txt', 'a+') as f:
-                f.write(f'{site}:{encrypted_password.decode()}\n')
+                f.write(f'{encrypted_site.decode()}:{encrypted_password.decode()}\n')
 
             self.senhas[site] = password
         else:
@@ -89,7 +97,7 @@ class GerenciadorDeSenhas:
     def buscar_senha(self, site):
         if self.isLogged:
             try:
-                print(self.senhas)
+                print(self.senhas[site])
             except:
                 print('Falha ao buscar senha')
         else:
