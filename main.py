@@ -1,5 +1,8 @@
-import bcrypt
+import base64
+import os
+# import bcrypt
 from cryptography.fernet import Fernet
+from cryptography.hazmat.primitives.kdf.argon2 import Argon2id # Criptografia de Derivação de chaves(KDF)
 
 class GerenciadorDeSenhas:
     # Criação do constructor
@@ -7,43 +10,50 @@ class GerenciadorDeSenhas:
         self.arquivo_senhas = None
         self.isLogged = False
         self.senhas = {}
-        self.key = None
         self.fernet = None
+        
+    def gerar_chave(self, senha_mestre, salt):
+        kdf = Argon2id(
+            salt=salt,
+            length=32,
+            iterations=1,
+            lanes=4,
+            memory_cost=2**21
+        )
+
+        return base64.urlsafe_b64encode(kdf.derive(senha_mestre.encode()))
 
     # O usuário precisa indicar onde vai salvar a senha mais importante dele
-    def criar_conta(self, senha_mestra, path):
-        hash_senha = bcrypt.hashpw(senha_mestra.encode(), bcrypt.gensalt())
+    def criar_conta(self, passphrase):
+        salt = os.urandom(16)
 
-        with open(path, 'wb') as f:
-            f.write(hash_senha)
+        key = self.gerar_chave(passphrase, salt)
+        self.fernet = Fernet(key)
 
-        self.key = Fernet.generate_key()
-        with open('secret.key', 'wb') as f:
-            f.write(self.key)
+        with open('salt.txt', 'wb') as f:
+            f.write(salt)
 
-        
+        self.isLogged = True
 
     # Verifica se o usuário tem uma conta
-    def login_conta(self, path, senha):
+    def login_conta(self, senha):
+        with open('salt.txt', 'rb') as f:
+            salt = f.read()
+
+        key = self.gerar_chave(senha, salt)
+        self.fernet = Fernet(key)
+
+        with open('senhas.txt', 'r') as f:
+            for line in f:
+                site, senha_criptografada = line.split(':')
+
         try:
-            # Acessa a chave mestra para comparar
-            with open(path, 'rb') as f:
-                chave_mestra = f.read()
+            senha_decifrada = self.fernet.decrypt(senha_criptografada.encode())
 
-            # Compara a senha digitada com a chave mestra
-            if bcrypt.checkpw(senha.encode(), chave_mestra):
-                print("Login realizado!")
-                self.isLogged = True
-
-                with open('secret.key', 'rb') as f:
-                    self.fernet = Fernet(f.read())
-
-                with open('senhas.txt', 'r') as f:
-                    for line in f:
-                        key, value = line.split(':')
-                        self.senhas[key] = self.fernet.decrypt(value.encode()).decode()
+            self.isLogged = True
+            print('Login feito')
         except:
-            print('Conta não encontrada, certifique-se de que uma foi criada')
+            print('Login negado')
 
     # Sai da conta e fecha o aplicativo
     def sair_conta(self):
@@ -51,13 +61,16 @@ class GerenciadorDeSenhas:
             
     # Mostra todas as senhas criadas se estiver logado
     def ver_senhas(self):
-        if self.isLogged:
-            with open('senhas.txt', 'r') as f:
-                for line in f:
-                    site, senha = line.split(':')
-                    print(site + ' - ' + self.fernet.decrypt(senha.encode()).decode())
-        else:
-            print('Você não possui acesso, verifique seu login')
+        try:
+            if self.isLogged:
+                with open('senhas.txt', 'r') as f:
+                    for line in f:
+                        site, senha = line.split(':')
+                        print(site + ' - ' + self.fernet.decrypt(senha.encode()).decode())
+            else:
+                print('Você não possui acesso, verifique seu login')
+        except:
+            print('Ainda não há um arquivo de senhas criado')
         
 
     # Permite criar uma senha nova se estiver logado
@@ -76,7 +89,7 @@ class GerenciadorDeSenhas:
     def buscar_senha(self, site):
         if self.isLogged:
             try:
-                print(f'Senha: {self.senhas[site]}')
+                print(self.senhas)
             except:
                 print('Falha ao buscar senha')
         else:
@@ -94,13 +107,11 @@ while True:
     match(opcao):
         case 1:
             senha = input('Digite uma senha segura: ')
-            caminho = input('Digite o lugar que deseja guardar a sua senha mestra: ')
 
-            pm.criar_conta(senha, caminho)
+            pm.criar_conta(senha)
         case 2:
-            caminho = input('Caminho da chave mestra: ')
             senha = input('Digite sua senha: ')
-            pm.login_conta(caminho, senha)
+            pm.login_conta(senha)
         case 3:
             site = input('Nome do site: ')
             senha = input('Senha que será salva: ')
