@@ -1,0 +1,282 @@
+from tkinter import *
+from PIL import Image, ImageTk
+
+root = Tk()
+global changer
+changer = False # Variável global para controle de telas
+root.overrideredirect(False) # Não brinque com isso (impede que a janela seja redimensionada, movida ou fechada)
+root.title("PasSword") # Título da janela
+root.iconphoto(True, PhotoImage(file="UNISAGRADO.png")) # Ícone da janela (precisa ser aberta como pasta para funcionar)
+root.geometry("1200x700") # Dimensões da janela
+root.resizable(False, False) # Impede a redimensionalização da janela
+root.config(bg="#0c809f") # Cor de fundo da janela
+
+
+
+# Slider lateral
+
+slider = Scale(root, 
+            from_=100, 
+            to=0, 
+            orient=VERTICAL, 
+            length=700, 
+            width=15,
+            showvalue=0, 
+            sliderlength=30, 
+            troughcolor="#141f29", 
+            fg="#141f29", 
+            bg="#a8c7e4",
+            bd=0,
+            highlightcolor="#a8c7e4", 
+            font=("Montserrat", 12, "bold"))
+slider.set(slider['from'])
+slider.pack(side=LEFT)
+
+
+
+# Funções
+
+
+def bloco_anotacao(num):
+    if num == 0:
+        # Cópia das Senhas para a área de transferência
+        passwd = "123456"
+        root.clipboard_clear() # Limpa a área de transferência
+        root.clipboard_append(passwd) # Copia a senha para a área de transferência
+
+        # Criação do campo de título da anotação
+        titulo_bloco = Text(root,
+                        font=("Montserrat", 24, "bold"),
+                        width=16,
+                        height=2,
+                        borderwidth=0,
+                        fg="#0c809f",
+                        bg="#141f29",
+                        highlightbackground="#141f29",
+                        highlightcolor="#141f29",
+                        highlightthickness=30)
+        titulo_bloco.place(x=850, y=0)
+        titulo_bloco.insert(0.0, "Titulo Irado")
+
+        # Criação do campo de anotação
+        anotacao = Text(root,
+                        font=("Montserrat", 15, "bold"),
+                        width=30,
+                        height=24,
+                        borderwidth=0,
+                        fg="#a8c7e4",
+                        bg="#141f29",
+                        highlightbackground="#141f29",
+                        highlightcolor="#141f29",
+                        highlightthickness=12)
+        anotacao.place(x=850, y=98)
+        anotacao.insert(0.0, "Senha do e-mail da USC")
+    elif num == 1:
+        passwd = "batata"
+        root.clipboard_clear() 
+        root.clipboard_append(passwd) 
+
+        titulo_bloco = Text(root,
+                        font=("Montserrat", 24, "bold"),
+                        width=16,
+                        height=2,
+                        borderwidth=0,
+                        fg="#0c809f",
+                        bg="#141f29",
+                        highlightbackground="#141f29",
+                        highlightcolor="#141f29",
+                        highlightthickness=30)
+        titulo_bloco.place(x=850, y=0)
+        titulo_bloco.insert(0.0, "Titulo Irado")
+
+        anotacao = Text(root,
+                        font=("Montserrat", 15, "bold"),
+                        width=30,
+                        height=24,
+                        borderwidth=0,
+                        fg="#a8c7e4",
+                        bg="#141f29",
+                        highlightbackground="#141f29",
+                        highlightcolor="#141f29",
+                        highlightthickness=12)
+        anotacao.place(x=850, y=98)
+        anotacao.insert(0.0, "Senha do e-mail pessoal")
+    elif num == 2:
+        passwd = "valdomiro"
+        root.clipboard_clear() 
+        root.clipboard_append(passwd) 
+
+        titulo_bloco = Text(root,
+                        font=("Montserrat", 24, "bold"),
+                        width=16,
+                        height=2,
+                        borderwidth=0,
+                        fg="#0c809f",
+                        bg="#141f29",
+                        highlightbackground="#141f29",
+                        highlightcolor="#141f29",
+                        highlightthickness=30)
+        titulo_bloco.place(x=850, y=0)
+        titulo_bloco.insert(0.0, "Titulo Irado")
+
+        anotacao = Text(root,
+                        font=("Montserrat", 15, "bold"),
+                        width=30,
+                        height=24,
+                        borderwidth=0,
+                        fg="#a8c7e4",
+                        bg="#141f29",
+                        highlightbackground="#141f29",
+                        highlightcolor="#141f29",
+                        highlightthickness=12)
+        anotacao.place(x=850, y=98)
+        anotacao.insert(0.0, "Senha do Facebook")
+    elif num == 3:
+        passwd = "destruição"
+        root.clipboard_clear() 
+        root.clipboard_append(passwd) 
+
+        titulo_bloco = Text(root,
+                        font=("Montserrat", 24, "bold"),
+                        width=16,
+                        height=2,
+                        borderwidth=0,
+                        fg="#0c809f",
+                        bg="#141f29",
+                        highlightbackground="#141f29",
+                        highlightcolor="#141f29",
+                        highlightthickness=30)
+        titulo_bloco.place(x=850, y=0)
+        titulo_bloco.insert(0.0, "Titulo Irado")
+
+        anotacao = Text(root,
+                        font=("Montserrat", 15, "bold"),
+                        width=30,
+                        height=24,
+                        borderwidth=0,
+                        fg="#a8c7e4",
+                        bg="#141f29",
+                        highlightbackground="#141f29",
+                        highlightcolor="#141f29",
+                        highlightthickness=12)
+        anotacao.place(x=850, y=98)
+        anotacao.insert(0.0, "Sensd")
+    elif num == 4:
+        passwd = "bersek"
+        root.clipboard_clear() 
+        root.clipboard_append(passwd)
+
+        titulo_bloco = Text(root,
+                        font=("Montserrat", 24, "bold"),
+                        width=16,
+                        height=2,
+                        borderwidth=0,
+                        fg="#0c809f",
+                        bg="#141f29",
+                        highlightbackground="#141f29",
+                        highlightcolor="#141f29",
+                        highlightthickness=30)
+        titulo_bloco.place(x=850, y=0)
+        titulo_bloco.insert(0.0, "Titulo Irado")
+
+        anotacao = Text(root,
+                        font=("Montserrat", 15, "bold"),
+                        width=30,
+                        height=24,
+                        borderwidth=0,
+                        fg="#a8c7e4",
+                        bg="#141f29",
+                        highlightbackground="#141f29",
+                        highlightcolor="#141f29",
+                        highlightthickness=12)
+        anotacao.place(x=850, y=98)
+        anotacao.insert(0.0, "Senha da senha")
+        
+
+
+
+
+
+
+# Blocos botões
+
+
+
+bloco1 = Button(root,
+            text="Unisagrado",
+            font=("Montserrat", 20, "bold"),
+            width=40,
+            height=2,
+            fg="#a8c7e4",
+            bg="#141f29",
+            activebackground="#141f29",
+            activeforeground="#a8c7e4",
+            bd=0,
+            highlightcolor="#a8c7e4",
+            command=lambda: bloco_anotacao(0))
+
+bloco2 = Button(root,
+            text="Connect+",
+            font=("Montserrat", 20, "bold"),
+            width=40,
+            height=2,
+            fg="#a8c7e4",
+            bg="#141f29",
+            activebackground="#141f29",
+            activeforeground="#a8c7e4",
+            bd=0,
+            highlightcolor="#a8c7e4",
+            command=lambda: bloco_anotacao(1))
+
+bloco3 = Button(root,
+            text="Conta Microsoft USC",
+            font=("Montserrat", 20, "bold"),
+            width=40,
+            height=2,
+            fg="#a8c7e4",
+            bg="#141f29",
+            activebackground="#141f29",
+            activeforeground="#a8c7e4",
+            bd=0,
+            highlightcolor="#a8c7e4",
+            command=lambda: bloco_anotacao(2))
+bloco4 = Button(root,
+            text="Conta Microsoft USC",
+            font=("Montserrat", 20, "bold"),
+            width=40,
+            height=2,
+            fg="#a8c7e4",
+            bg="#141f29",
+            activebackground="#141f29",
+            activeforeground="#a8c7e4",
+            bd=0,
+            highlightcolor="#a8c7e4",
+            command=lambda: bloco_anotacao(3))
+
+bloco5 = Button(root,
+            text="Conta Microsoft USC",
+            font=("Montserrat", 20, "bold"),
+            width=40,
+            height=2,
+            fg="#a8c7e4",
+            bg="#141f29",
+            activebackground="#141f29",
+            activeforeground="#a8c7e4",
+            bd=0,
+            highlightcolor="#a8c7e4",
+            command=lambda: bloco_anotacao(4))
+
+
+# Posicionamento dos blocos
+
+
+
+
+bloco1.place(x=120, y=50)
+bloco2.place(x=120, y=200)
+bloco3.place(x=120, y=350)
+bloco4.place(x=120, y=500)
+bloco5.place(x=120, y=650)
+
+
+root.mainloop()
