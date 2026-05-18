@@ -1,5 +1,5 @@
 import bcrypt
-from cryptography import Fernet
+from cryptography.fernet import Fernet
 
 class GerenciadorDeSenhas:
     # Criação do constructor
@@ -8,6 +8,7 @@ class GerenciadorDeSenhas:
         self.isLogged = False
         self.senhas = {}
         self.key = None
+        self.fernet = None
 
     # O usuário precisa indicar onde vai salvar a senha mais importante dele
     def criar_conta(self, senha_mestra, path):
@@ -15,6 +16,12 @@ class GerenciadorDeSenhas:
 
         with open(path, 'wb') as f:
             f.write(hash_senha)
+
+        self.key = Fernet.generate_key()
+        with open('secret.key', 'wb') as f:
+            f.write(self.key)
+
+        
 
     # Verifica se o usuário tem uma conta
     def login_conta(self, path, senha):
@@ -28,10 +35,13 @@ class GerenciadorDeSenhas:
                 print("Login realizado!")
                 self.isLogged = True
 
+                with open('secret.key', 'rb') as f:
+                    self.fernet = Fernet(f.read())
+
                 with open('senhas.txt', 'r') as f:
                     for line in f:
                         key, value = line.split(':')
-                        self.senhas[key] = value
+                        self.senhas[key] = self.fernet.decrypt(value.encode()).decode()
         except:
             print('Conta não encontrada, certifique-se de que uma foi criada')
 
@@ -45,7 +55,7 @@ class GerenciadorDeSenhas:
             with open('senhas.txt', 'r') as f:
                 for line in f:
                     site, senha = line.split(':')
-                    print(f'{site}: {senha}')
+                    print(site + ' - ' + self.fernet.decrypt(senha.encode()).decode())
         else:
             print('Você não possui acesso, verifique seu login')
         
@@ -53,13 +63,14 @@ class GerenciadorDeSenhas:
     # Permite criar uma senha nova se estiver logado
     def criar_nova_senha(self, site, password):
         if self.isLogged:
+            encrypted_password = self.fernet.encrypt(password.encode())
             with open('senhas.txt', 'a+') as f:
-                f.write(f'{site}:{password}\n')
+                f.write(f'{site}:{encrypted_password.decode()}\n')
+
+            self.senhas[site] = password
         else:
             print('Você não possui acesso, verifique seu login')
         
-
-        self.senhas[site] = password
 
     # Buscar uma das senhas se estiver logado
     def buscar_senha(self, site):
