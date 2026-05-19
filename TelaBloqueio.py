@@ -1,5 +1,8 @@
 from tkinter import *
 from PIL import Image, ImageTk
+
+
+
 import main
 
 root = Tk() # Base TkInter
@@ -21,7 +24,10 @@ pm = main.GerenciadorDeSenhas()
 def login():
     
     global changer
-    if user_login.get() == "admin" and user_passw.get() == "admin": # Verifica se o usuário e a senha estão corretos (nesse caso, ambos são "admin")
+
+    #  user_login.get() == "admin" and user_passw.get() == "admin"
+
+    if user_login.get() == 'admin' and pm.login_conta(user_passw.get()): # Verifica se o usuário e a senha estão corretos (nesse caso, ambos são "admin")
         changer = True # Altera a variável global "changer" para 1 para mostrar a tela principal
         root.destroy() # Fecha a janela atual
         import TelaPrincipal # Importa o arquivo da tela principal (precisa ser aberta como pasta para funcionar)
