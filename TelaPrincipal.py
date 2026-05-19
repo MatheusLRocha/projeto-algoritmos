@@ -1,5 +1,4 @@
 from tkinter import *
-from PIL import Image, ImageTk
 
 root = Tk()
 global changer
@@ -10,6 +9,49 @@ root.iconphoto(True, PhotoImage(file="UNISAGRADO.png")) # Ícone da janela (prec
 root.geometry("1200x700") # Dimensões da janela
 root.resizable(False, False) # Impede a redimensionalização da janela
 root.config(bg="#0c809f") # Cor de fundo da janela
+
+
+
+# Modelo de formatação
+
+# Título
+sample0 = {
+    "font":("Montserrat", 24, "bold"),
+    "width":16,
+    "height":2,
+    "borderwidth":0,
+    "fg":"#0c809f",
+    "bg":"#141f29",
+    "highlightbackground":"#141f29",
+    "highlightcolor":"#141f29",
+    "highlightthickness":30
+}
+
+# Anotação
+sample1 = {
+    "font":("Montserrat", 15, "bold"),
+    "width":30,
+    "height":20,
+    "borderwidth":0,
+    "fg":"#a8c7e4",
+    "bg":"#141f29",
+    "highlightbackground":"#141f29",
+    "highlightcolor":"#141f29",
+    "highlightthickness":12
+}
+
+# Botões
+sample2 = {
+    "font": ("Montserrat", 20, "bold"),
+    "width": 40,
+    "height": 2,
+    "fg": "#a8c7e4",
+    "bg": "#141f29",
+    "activebackground": "#141f29",
+    "activeforeground": "#a8c7e4",
+    "bd": 0,
+    "highlightcolor": "#a8c7e4"
+}
 
 
 

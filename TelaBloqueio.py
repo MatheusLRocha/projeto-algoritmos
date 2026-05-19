@@ -1,6 +1,6 @@
 from tkinter import *
-from PIL import Image, ImageTk
 import main
+
 
 root = Tk() # Base TkInter
 global changer
@@ -15,30 +15,24 @@ root.config(bg="#0c809f") # Cor de fundo da janela
 # Instancia o gerenciador de senhas para acessar as funções de login e gerenciamento de senhas
 pm = main.GerenciadorDeSenhas()
 
-# Tela Login
 
 # Funções
 def login():
     
     global changer
-    if user_login.get() == "admin" and user_passw.get() == "admin": # Verifica se o usuário e a senha estão corretos (nesse caso, ambos são "admin")
+    if user_passw.get() == "admin": # Verifica se a senha está correta
         changer = True # Altera a variável global "changer" para 1 para mostrar a tela principal
         root.destroy() # Fecha a janela atual
         import TelaPrincipal # Importa o arquivo da tela principal (precisa ser aberta como pasta para funcionar)
     else:
-        user_login.delete(0, END) # Limpa o campo de entrada do usuário
         user_passw.delete(0, END) # Limpa o campo de entrada da senha
-        user_login.focus() # Foca no campo de entrada do usuário
+        user_passw.focus() # Foca no campo de entrada do usuário
         error = Label(root,
-                    text="Usuário ou senha incorretos!", # Texto do erro
-                    font=("Montserrat",15,"bold"),
+                    text="Senha incorreta!", # Texto do erro
+                    font=("Montserrat",20,"bold"),
                     fg="#990c0c", # Cor do texto do erro
                     bg="#0c809f")
-        error.place(x=150,y=750) # Posicionamento do texto de erro
-
-
-
-
+        error.place(x=190,y=500) # Posicionamento do texto de erro
 
 
 
@@ -53,10 +47,6 @@ pasSword = Label(root,
                 font=("Montserrat",60,"underline","bold"),
                 fg="#a8c7e4", # Cor do título
                 bg="#0c809f")
-user = Label(root,
-            text="Usuário",
-            font=("Montserrat",22,"bold"),
-            bg="#0c809f")
 passw = Label(root,
             text="Senha",
             font=("Montserrat",22,"bold"),
@@ -64,10 +54,6 @@ passw = Label(root,
 
 
 # Campos de entrada
-user_login = Entry(root,
-                font=("Montserrat",20),
-                width=30, # Largura do campo de entrada
-                borderwidth=2) # Largura da borda
 user_passw = Entry(root,
                 font=("Montserrat",20),
                 width=30,
@@ -90,11 +76,8 @@ login_button = Button(root,
 preSword.place(x=65,y=30) # Posicionamento do subtítulo
 pasSword.place(x=90,y=100) # Posicionamento do título
 
-user.place(x=245,y=340) # Posicionamento do texto do campo de usuário
-passw.place(x=256,y=510) # Posicionamento do texto do campo de senha
-
-user_login.place(x=85,y=390) # Posicionamento do campo de entrada para o usuário
-user_passw.place(x=85,y=560) # Posicionamento do campo de entrada para a senha
+passw.place(x=245,y=400) # Posicionamento do texto do campo de senha
+user_passw.place(x=70,y=450) # Posicionamento do campo de entrada para a senha
 
 login_button.place(x=250,y=690) # Posicionamento do botão de login
 
