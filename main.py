@@ -77,8 +77,14 @@ class GerenciadorDeSenhas:
                         self.senhas[self.fernet.decrypt(key).decode()] = self.fernet.decrypt(value).decode()
             except:
                 print('Ainda não há senhas no cofre')
+
+            return self.isLogged
         except:
             print('Login negado')
+
+            self.isLogged = False
+
+            return self.isLogged
 
     # Sai da conta e fecha o aplicativo
     def sair_conta(self):
@@ -129,32 +135,33 @@ class GerenciadorDeSenhas:
 
 pm = GerenciadorDeSenhas()
 
-while True:
-    print('(1) Criar conta\n(2) Entrar na conta\n(3) Criar nova senha\n(4) Ver senhas\n(5) Buscar senha\n(6) Sair')
+if __name__ == '__main__':
+    while True:
+        print('(1) Criar conta\n(2) Entrar na conta\n(3) Criar nova senha\n(4) Ver senhas\n(5) Buscar senha\n(6) Sair')
 
-    opcao = int(input('Escolha uma opção: '))
+        opcao = int(input('Escolha uma opção: '))
 
-    match(opcao):
-        case 1:
-            senha = input('Digite uma senha segura: ')
+        match(opcao):
+            case 1:
+                senha = input('Digite uma senha segura: ')
 
-            pm.criar_conta(senha)
-        case 2:
-            senha = input('Digite sua senha: ')
-            pm.login_conta(senha)
-        case 3:
-            site = input('Nome do site: ')
-            senha = input('Senha que será salva: ')
+                pm.criar_conta(senha)
+            case 2:
+                senha = input('Digite sua senha: ')
+                pm.login_conta(senha)
+            case 3:
+                site = input('Nome do site: ')
+                senha = input('Senha que será salva: ')
 
-            pm.criar_nova_senha(site, senha)
-        case 4:
-            pm.ver_senhas()
-        case 5:
-            site = input('Digite o site que se deseja buscar: ')
-            pm.buscar_senha(site)
-        case 6:
-            print('Saindo...')
-            pm.sair_conta()
-            break
-        case _:
-            print('Valor inválido')
+                pm.criar_nova_senha(site, senha)
+            case 4:
+                pm.ver_senhas()
+            case 5:
+                site = input('Digite o site que se deseja buscar: ')
+                pm.buscar_senha(site)
+            case 6:
+                print('Saindo...')
+                pm.sair_conta()
+                break
+            case _:
+                print('Valor inválido')

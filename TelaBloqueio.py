@@ -20,7 +20,8 @@ pm = main.GerenciadorDeSenhas()
 def login():
     
     global changer
-    if user_passw.get() == "admin": # Verifica se a senha está correta
+
+    if pm.login_conta(user_passw.get()): # Verifica se o usuário e a senha estão corretos (nesse caso, ambos são "admin")
         changer = True # Altera a variável global "changer" para 1 para mostrar a tela principal
         root.destroy() # Fecha a janela atual
         import TelaPrincipal # Importa o arquivo da tela principal (precisa ser aberta como pasta para funcionar)
