@@ -1,5 +1,6 @@
 from tkinter import *
 from PIL import Image, ImageTk
+import main
 
 root = Tk() # Base TkInter
 global changer
@@ -11,7 +12,8 @@ root.geometry("600x800") # Dimensões da janela
 root.resizable(False, False) # Impede a redimensionalização da janela
 root.config(bg="#0c809f") # Cor de fundo da janela
 
-
+# Instancia o gerenciador de senhas para acessar as funções de login e gerenciamento de senhas
+pm = main.GerenciadorDeSenhas()
 
 # Tela Login
 
