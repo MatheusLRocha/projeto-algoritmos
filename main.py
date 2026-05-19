@@ -139,6 +139,8 @@ class GerenciadorDeSenhas:
                 senha = None
 
                 # Descriptografa cada senha do banco de dados e compara com o site, buscando valor válido, se encontrar, retorna a senha descriptografada
+
+                # Provavelmente não é o melhor método, mas é um que funciona por agora
                 for item in self.banco.listar_senhas():
                     if self.fernet.decrypt(item.title.encode()).decode() == site:
                         senha = self.fernet.decrypt(self.banco.buscar_senha(item.title).password.encode()).decode()
