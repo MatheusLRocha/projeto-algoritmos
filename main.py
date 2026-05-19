@@ -1,8 +1,7 @@
-import base64
-import os
-# import bcrypt
-from cryptography.fernet import Fernet
-from cryptography.hazmat.primitives.kdf.argon2 import Argon2id # Criptografia de Derivação de chaves(KDF)
+import base64 # Mexe com codificação e decodificação de dados
+import os # Mexe com arquivos e diretórios
+from cryptography.fernet import Fernet # Criptografia simétrica, cria uma chave para descriptografar e criptografar dados
+from cryptography.hazmat.primitives.kdf.argon2 import Argon2id # Derivação de chaves(KDF)
 
 class GerenciadorDeSenhas:
     # Criação do constructor
@@ -12,7 +11,9 @@ class GerenciadorDeSenhas:
         self.senhas = {}
         self.fernet = None
         
+    # Gera chave de criptografia com base na senha mestre e salt.    
     def gerar_chave(self, senha_mestre, salt):
+        # Código feito a partir da documentação do fernet e do argon2id, ambos da biblioteca cryptography
         kdf = Argon2id(
             salt=salt,
             length=32,
@@ -21,15 +22,19 @@ class GerenciadorDeSenhas:
             memory_cost=2**21
         )
 
+        # Retorna a chave gerada a partir da senha mestre e do salt, codificada em base64 para ser usada pelo fernet
         return base64.urlsafe_b64encode(kdf.derive(senha_mestre.encode()))
 
     # O usuário precisa indicar onde vai salvar a senha mais importante dele
     def criar_conta(self, passphrase):
+        # salt é gerado aleatoriamente
         salt = os.urandom(16)
 
+        # Gera a chave e criptografia e coloca ela no fernet
         key = self.gerar_chave(passphrase, salt)
         self.fernet = Fernet(key)
 
+        # Cria um arquivo para salvar o salt e outro para salvar a senha criptografada de autenticação
         with open('salt.txt', 'wb') as f:
             f.write(salt)
 
@@ -37,27 +42,34 @@ class GerenciadorDeSenhas:
             texto_cofre = self.fernet.encrypt(b'Cofre criado')
             f.write(texto_cofre.decode() + '\n')
 
+        # Após criar a conta, o usuário já está logado
         self.isLogged = True
 
     # Verifica se o usuário tem uma conta
     def login_conta(self, senha_mestra):
+        # Pega o salt armazenado
         with open('salt.txt', 'rb') as f:
             salt = f.read()
 
+        # Gera a chave de criptografia a partir da senha mestre e do salt, e coloca ela no fernet
         key = self.gerar_chave(senha_mestra, salt)
         self.fernet = Fernet(key)
 
+        # Pega a autenticação criptografada armazenada
         with open('autenticacao.txt', 'r') as f:
             dados_criptografados = f.readline()
 
         try:
+            # Descriptografa a autenticação para verificar se a senha mestre está correta
             dados_descriptografados = self.fernet.decrypt(dados_criptografados.encode())
 
+            # Se estiver, o usuário é logado e as senhas salvas são carregadas para a memória
             self.isLogged = True
 
             print('Login feito com sucesso!')
 
             try:
+                # Abre o cofre de senhas e armazena todas elas em um dicionário para facilitar o acesso
                 with open('senhas.txt', 'r') as f:
                     for line in f:
                         key, value = line.split(':')
@@ -89,11 +101,15 @@ class GerenciadorDeSenhas:
     # Permite criar uma senha nova se estiver logado
     def criar_nova_senha(self, site, password):
         if self.isLogged:
+            # Criptografa o nome do site e a senha
             encrypted_site = self.fernet.encrypt(site.encode())
             encrypted_password = self.fernet.encrypt(password.encode())
+
+            # Salva a senha criptografada no arquivo de senhas, junto com o nome do site criptografado
             with open('senhas.txt', 'a+') as f:
                 f.write(f'{encrypted_site.decode()}:{encrypted_password.decode()}\n')
 
+            # Armazena a senha no dicionário de senhas para facilitar o acesso
             self.senhas[site] = password
         else:
             print('Você não possui acesso, verifique seu login')
