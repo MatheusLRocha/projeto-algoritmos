@@ -1,4 +1,5 @@
 from tkinter import *
+import main
 
 root = Tk()
 root.overrideredirect(False) # Não brinque com isso (impede que a janela seja redimensionada, movida ou fechada)
@@ -90,6 +91,23 @@ def change_bloco(num):
                     text="Mudar bloco",
                     command=lambda: mudar_bloco(num))
     mudar_bloco.place(x=850, y=700)
+
+# def bloco(id):
+#     passwd = "123456"
+#     root.clipboard_clear() # Limpa a área de transferência
+#     root.clipboard_append(passwd) # Copia a senha para a área de transferência
+
+#     # Criação do campo de título da anotação
+#     titulo_bloco = Text(root,**sample0)
+#     titulo_bloco.place(x=850, y=0)
+#     titulo_bloco.insert(0.0, titulo1)
+
+#     # Criação do campo de anotação
+#     anotacao = Text(root,**sample1)
+#     anotacao.place(x=850, y=98)
+#     anotacao.insert(0.0, "Senha do e-mail da USC")
+#     change_bloco(num)
+
 
 def bloco_anotacao(num):
     if num == 0:

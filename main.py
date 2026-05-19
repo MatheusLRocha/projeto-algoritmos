@@ -2,13 +2,39 @@ import base64 # Mexe com codificação e decodificação de dados
 import os # Mexe com arquivos e diretórios
 from cryptography.fernet import Fernet # Criptografia simétrica, cria uma chave para descriptografar e criptografar dados
 from cryptography.hazmat.primitives.kdf.argon2 import Argon2id # Derivação de chaves(KDF)
+from database import Password, db # Importa a classe Password e o banco de dados do arquivo database.py
+
+class ConexaoBancoDeDados:
+    def __init__(self):
+        db.connect() # Conecta ao banco de dados
+        db.create_tables([Password]) # Cria a tabela de senhas no banco de dados, caso ela ainda não exista
+
+    # CRUD(Create, Read, Update, Delete) para manipular os dados do banco de dados utilizando a classe Password
+
+    def adicionar_senha(self, title, password):
+        # Cria um novo registro de senha no banco de dados utilizando a classe Password
+        Password.create(title=title, password=password) 
+
+    def listar_senhas(self):
+        # Retorna todas as senhas armazenadas no banco de dados
+        return Password.select()
+    
+    def buscar_senha(self, title):
+        return Password.get_or_none(Password.title == title)
+    
+    def atualizar_senha(self, title, new_password):
+        ...
+
+    def deletar_senha(self, title):
+        ...
+
+        
 
 class GerenciadorDeSenhas:
     # Criação do constructor
-    def __init__(self):
-        self.arquivo_senhas = None
+    def __init__(self, banco):
+        self.banco = banco
         self.isLogged = False
-        self.senhas = {}
         self.fernet = None
         
     # Gera chave de criptografia com base na senha mestre e salt.    
@@ -64,26 +90,15 @@ class GerenciadorDeSenhas:
             dados_descriptografados = self.fernet.decrypt(dados_criptografados.encode())
 
             # Se estiver, o usuário é logado e as senhas salvas são carregadas para a memória
-            self.isLogged = True
 
             print('Login feito com sucesso!')
 
-            try:
-                # Abre o cofre de senhas e armazena todas elas em um dicionário para facilitar o acesso
-                with open('senhas.txt', 'r') as f:
-                    for line in f:
-                        key, value = line.split(':')
-
-                        self.senhas[self.fernet.decrypt(key).decode()] = self.fernet.decrypt(value).decode()
-            except:
-                print('Ainda não há senhas no cofre')
-
+            self.isLogged = True
             return self.isLogged
         except:
             print('Login negado')
 
             self.isLogged = False
-
             return self.isLogged
 
     # Sai da conta e fecha o aplicativo
@@ -94,10 +109,10 @@ class GerenciadorDeSenhas:
     def ver_senhas(self):
         try:
             if self.isLogged:
-                with open('senhas.txt', 'r') as f:
-                    for line in f:
-                        site, senha = line.split(':')
-                        print(self.fernet.decrypt(site.encode()).decode() + ' - ' + self.fernet.decrypt(senha.encode()).decode())
+                senhas = self.banco.listar_senhas()
+
+                for senha in senhas:
+                    print(f'{self.fernet.decrypt(senha.title.encode()).decode()}: {self.fernet.decrypt(senha.password.encode()).decode()}')
             else:
                 print('Você não possui acesso, verifique seu login')
         except:
@@ -111,12 +126,8 @@ class GerenciadorDeSenhas:
             encrypted_site = self.fernet.encrypt(site.encode())
             encrypted_password = self.fernet.encrypt(password.encode())
 
-            # Salva a senha criptografada no arquivo de senhas, junto com o nome do site criptografado
-            with open('senhas.txt', 'a+') as f:
-                f.write(f'{encrypted_site.decode()}:{encrypted_password.decode()}\n')
-
-            # Armazena a senha no dicionário de senhas para facilitar o acesso
-            self.senhas[site] = password
+            # Salva a senha criptografada no banco de dados utilizando a função adicionar_senha da Classe ConexaoBancoDeDados
+            self.banco.adicionar_senha(encrypted_site.decode(), encrypted_password.decode())
         else:
             print('Você não possui acesso, verifique seu login')
         
@@ -125,15 +136,29 @@ class GerenciadorDeSenhas:
     def buscar_senha(self, site):
         if self.isLogged:
             try:
-                print(self.senhas[site])
+                senha = None
+
+                # Descriptografa cada senha do banco de dados e compara com o site, buscando valor válido, se encontrar, retorna a senha descriptografada
+                for item in self.banco.listar_senhas():
+                    if self.fernet.decrypt(item.title.encode()).decode() == site:
+                        senha = self.fernet.decrypt(self.banco.buscar_senha(item.title).password.encode()).decode()
+
+                # Se existir a senha, exibe ela
+                if senha is not None:
+                    print(f'Senha: {senha}')
+                else:
+                    print('Senha não encontrada')
+                    return None
             except:
-                print('Falha ao buscar senha')
+                print('Ainda não há um arquivo de senhas criado')
+            
         else:
             print('Você não possui acesso, verifique seu login')
         
         
 
-pm = GerenciadorDeSenhas()
+# Instancia o gerenciador de senhas para acessar as funções de login e gerenciamento de senhas
+pm = GerenciadorDeSenhas(ConexaoBancoDeDados())
 
 if __name__ == '__main__':
     while True:
