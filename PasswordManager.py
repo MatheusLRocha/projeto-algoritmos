@@ -80,6 +80,7 @@ class PasswordService:
     # Sai da conta e fecha o aplicativo
     def sair_conta(self):
         self.isLogged = False
+        self.fernet = None
 
     # Permite criar uma senha nova se estiver logado
     def new_password(self, title, password):

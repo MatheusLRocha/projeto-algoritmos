@@ -93,7 +93,9 @@ def abrir_tela(pm):
         mudar_bloco.place(x=850, y=700)
 
 
-    def bloco_anotacao(id, titulo, senha):
+    def bloco_anotacao(id, titulo, senha_criptografada):
+        senha = pm.fernet.decrypt(senha_criptografada.encode()).decode()
+
         # Cópia das Senhas para a área de transferência
         passwd = senha
         root.clipboard_clear() # Limpa a área de transferência
@@ -125,9 +127,8 @@ def abrir_tela(pm):
         password = senha.password
 
         decrypt_title = pm.fernet.decrypt(title.encode()).decode()
-        decrypt_password = pm.fernet.decrypt(password.encode()).decode()
 
-        card(senha.id, decrypt_title, decrypt_password)
+        card(senha.id, decrypt_title, password)
 
 
 
