@@ -10,14 +10,6 @@ def abrir_tela(pm):
     root.config(bg="#0c809f") # Cor de fundo da janela
 
     # Variáveis
-    
-    changer = False # Variável global para controle de telas
-
-    titulo1 = "Unisagrado"
-    titulo2 = "Microsoft"
-    titulo3 = "Pergamum"
-    titulo4 = "Roblox"
-    titulo5 = "Netflix"
 
     # Modelo de formatação
 
@@ -60,6 +52,19 @@ def abrir_tela(pm):
         "highlightcolor": "#a8c7e4"
     }
 
+    sample3 = {
+        "font": ("Montserrat", 22, "bold"),
+        "width": 4,
+        "height": 1,
+        "fg": "#a8c7e4",
+        "bg": "#141f29",
+        "activebackground": "#141f29",
+        "activeforeground": "#a8c7e4",
+        "bd": 0,
+        "highlightcolor": "#a8c7e4"
+    }
+
+
 
 
 
@@ -83,14 +88,18 @@ def abrir_tela(pm):
     slider.pack(side=LEFT)
 
 
-    senhas = pm.show_passwords()
 
     # Funções
+    def add_card():
+        root.destroy() # Fecha a janela atual
+
+        import TelaBloco # Importa o arquivo da tela principal (precisa ser aberta como pasta para funcionar)
     def change_bloco(id):
         mudar_bloco = Button(root,
                         text="Mudar bloco",
                         command=lambda: mudar_bloco(id))
         mudar_bloco.place(x=850, y=700)
+
 
 
     def bloco_anotacao(id, titulo, senha_criptografada):
@@ -114,14 +123,29 @@ def abrir_tela(pm):
 
 
     # Blocos botões
+    add_card_block = Button(root,
+                            text="+",
+                            **sample3,
+                            command=add_card)
+    add_card_block.place(x=30, y=50)
+
+
+
+
+    # Instancia todas as senhas presentes
     def card(id, titulo, senha):
         card_anotacao = Button(root,
                             text=titulo,
                             **sample2,
                             command=lambda: bloco_anotacao(id, titulo, senha))
 
-        card_anotacao.place(x=120, y=50 * (id * 2))
+        card_anotacao.place(x=120, y=50 + (space))
 
+
+
+    # Prepara a instanciação das senhas
+    senhas = pm.show_passwords()
+    space=0
     for senha in senhas:
         title = senha.title
         password = senha.password
@@ -129,6 +153,7 @@ def abrir_tela(pm):
         decrypt_title = pm.fernet.decrypt(title.encode()).decode()
 
         card(senha.id, decrypt_title, password)
+        space+=130
 
 
 

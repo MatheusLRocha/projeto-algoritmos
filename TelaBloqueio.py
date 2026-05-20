@@ -60,6 +60,7 @@ passw = Label(root,
 
 
 # Campos de entrada
+
 user_passw = Entry(root,
                 font=("Montserrat",20),
                 width=30,
