@@ -1,9 +1,9 @@
 from tkinter import *
-import main
+from PasswordManager import PasswordService
+from PasswordBank import PasswordRepository
 
 
 root = Tk() # Base TkInter
-global changer
 changer = False # Variável global para controle de telas
 root.overrideredirect(False) # Não brinque com isso (impede que a janela seja redimensionada, movida ou fechada)
 root.title("PasSword") # Título da janela
@@ -13,7 +13,10 @@ root.resizable(False, False) # Impede a redimensionalização da janela
 root.config(bg="#0c809f") # Cor de fundo da janela
 
 # Instancia o gerenciador de senhas para acessar as funções de login e gerenciamento de senhas
-pm = main.GerenciadorDeSenhas()
+# banco = BancoSenhas.ConexaoBancoDeDados()
+
+banco = PasswordRepository()
+pm = PasswordService(banco)
 
 # Funções
 def login():
@@ -23,7 +26,10 @@ def login():
     if pm.login_conta(user_passw.get()): # Verifica se o usuário e a senha estão corretos (nesse caso, ambos são "admin")
         changer = True # Altera a variável global "changer" para 1 para mostrar a tela principal
         root.destroy() # Fecha a janela atual
+
         import TelaPrincipal # Importa o arquivo da tela principal (precisa ser aberta como pasta para funcionar)
+        TelaPrincipal.abrir_tela(pm)
+
     else:
         user_passw.delete(0, END) # Limpa o campo de entrada da senha
         user_passw.focus() # Foca no campo de entrada do usuário
@@ -80,9 +86,5 @@ passw.place(x=245,y=400) # Posicionamento do texto do campo de senha
 user_passw.place(x=70,y=450) # Posicionamento do campo de entrada para a senha
 
 login_button.place(x=250,y=690) # Posicionamento do botão de login
-
-
-
-
 
 root.mainloop()
