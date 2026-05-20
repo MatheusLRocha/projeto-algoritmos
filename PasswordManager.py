@@ -1,20 +1,18 @@
-from BancoSenhas import ConexaoBancoDeDados
+from PasswordBank import PasswordRepository
 import base64 # Mexe com codificação e decodificação de dados
 import os # Mexe com arquivos e diretórios
 from cryptography.fernet import Fernet # Criptografia simétrica, cria uma chave para descriptografar e criptografar dados
 from cryptography.hazmat.primitives.kdf.argon2 import Argon2id # Derivação de chaves(KDF)
 
-banco = ConexaoBancoDeDados()
-
-class GerenciadorDeSenhas:
+class PasswordService:
     # Criação do constructor
-    def __init__(self):
-        
+    def __init__(self, banco):
+        self.banco = banco
         self.isLogged = False
         self.fernet = None
         
     # Gera chave de criptografia com base na senha mestre e salt.    
-    def gerar_chave(self, senha_mestre, salt):
+    def generate_key(self, master_password, salt):
         # Código feito a partir da documentação do fernet e do argon2id, ambos da biblioteca cryptography
         kdf = Argon2id(
             salt=salt,
@@ -24,8 +22,9 @@ class GerenciadorDeSenhas:
             memory_cost=2**21
         )
 
+
         # Retorna a chave gerada a partir da senha mestre e do salt, codificada em base64 para ser usada pelo fernet
-        return base64.urlsafe_b64encode(kdf.derive(senha_mestre.encode()))
+        return base64.urlsafe_b64encode(kdf.derive(master_password.encode()))
 
     # O usuário precisa indicar onde vai salvar a senha mais importante dele
     def criar_conta(self, passphrase):
@@ -33,39 +32,40 @@ class GerenciadorDeSenhas:
         salt = os.urandom(16)
 
         # Gera a chave e criptografia e coloca ela no fernet
-        key = self.gerar_chave(passphrase, salt)
+        key = self.generate_key(passphrase, salt)
         self.fernet = Fernet(key)
+
+        # Deleta as senhas da conta antiga e cria uma nova tabela de senhas
+        self.banco.new_register()
 
         # Cria um arquivo para salvar o salt e outro para salvar a senha criptografada de autenticação
         with open('salt.txt', 'wb') as f:
             f.write(salt)
 
-        with open('autenticacao.txt', 'w') as f:
-            texto_cofre = self.fernet.encrypt(b'Cofre criado')
-            f.write(texto_cofre.decode() + '\n')
+        with open('autenticacao.txt', 'wb') as f:
+            safe_text = self.fernet.encrypt(b'Cofre criado')
+            f.write(safe_text)
 
         # Após criar a conta, o usuário já está logado
         self.isLogged = True
 
     # Verifica se o usuário tem uma conta
-    def login_conta(self, senha_mestra):
+    def login_conta(self, master_password):
         # Pega o salt armazenado
         with open('salt.txt', 'rb') as f:
             salt = f.read()
 
         # Gera a chave de criptografia a partir da senha mestre e do salt, e coloca ela no fernet
-        key = self.gerar_chave(senha_mestra, salt)
+        key = self.generate_key(master_password, salt)
         self.fernet = Fernet(key)
 
         # Pega a autenticação criptografada armazenada
-        with open('autenticacao.txt', 'r') as f:
-            dados_criptografados = f.readline()
+        with open('autenticacao.txt', 'rb') as f:
+            encrypted_data = f.readline()
 
         try:
             # Descriptografa a autenticação para verificar se a senha mestre está correta
-            dados_descriptografados = self.fernet.decrypt(dados_criptografados.encode())
-
-            # Se estiver, o usuário é logado e as senhas salvas são carregadas para a memória
+            self.fernet.decrypt(encrypted_data)
 
             print('Login feito com sucesso!')
 
@@ -80,64 +80,62 @@ class GerenciadorDeSenhas:
     # Sai da conta e fecha o aplicativo
     def sair_conta(self):
         self.isLogged = False
+
+    # Permite criar uma senha nova se estiver logado
+    def new_password(self, title, password):
+        if self.isLogged:
+            # Criptografa o nome do site e a senha
+            encrypted_title = self.fernet.encrypt(title.encode())
+            encrypted_password = self.fernet.encrypt(password.encode())
+
+            # Salva a senha criptografada no banco de dados utilizando a função adicionar da Classe PasswordRepository
+            self.banco.add(encrypted_title.decode(), encrypted_password.decode())
+        else:
+            print('Você não possui acesso, verifique seu login')
             
     # Mostra todas as senhas criadas se estiver logado
-    def ver_senhas(self):
+    def show_passwords(self):
         try:
             if self.isLogged:
-                senhas = banco.listar_senhas()
+                encrypted_passwords = self.banco.list()
 
-                return senhas
+                return encrypted_passwords
             else:
                 print('Você não possui acesso, verifique seu login')
         except:
             print('Ainda não há um arquivo de senhas criado')
-        
 
-    # Permite criar uma senha nova se estiver logado
-    def criar_nova_senha(self, site, password):
-        if self.isLogged:
-            # Criptografa o nome do site e a senha
-            encrypted_site = self.fernet.encrypt(site.encode())
-            encrypted_password = self.fernet.encrypt(password.encode())
-
-            # Salva a senha criptografada no banco de dados utilizando a função adicionar_senha da Classe ConexaoBancoDeDados
-            banco.adicionar_senha(encrypted_site.decode(), encrypted_password.decode())
-        else:
-            print('Você não possui acesso, verifique seu login')
-        
-
-    # Buscar uma das senhas se estiver logado
-    def buscar_senha(self, site):
+    def update_password(self, title, new_password):
         if self.isLogged:
             try:
-                senha = None
-
-                # Descriptografa cada senha do banco de dados e compara com o site, buscando valor válido, se encontrar, retorna a senha descriptografada
-
-                # Provavelmente não é o melhor método, mas é um que funciona por agora
-                for item in banco.listar_senhas():
-                    if self.fernet.decrypt(item.title.encode()).decode() == site:
-                        senha = self.fernet.decrypt(banco.buscar_senha(item.title).password.encode()).decode()
-
-                # Se existir a senha, exibe ela
-                if senha is not None:
-                    print(f'Senha: {senha}')
-                else:
-                    print('Senha não encontrada')
-                    return None
+                encrypted_new_password = self.fernet.encrypt(new_password.encode())
+                for item in self.banco.list():
+                    if self.fernet.decrypt(item.title.encode()).decode() == title:
+                        self.banco.update(item.title, encrypted_new_password.decode())
             except:
                 print('Ainda não há um arquivo de senhas criado')
-            
         else:
             print('Você não possui acesso, verifique seu login')
+    
+    def delete_password(self, title):
+        if self.isLogged:
+            try:
+                for item in self.banco.list():
+                    if self.fernet.decrypt(item.title.encode()).decode() == title:
+                        self.banco.delete(item.title)
+            except:
+                print('Ainda não há um arquivo de senhas criado')
+        else:
+            print('Você não possui acesso, verifique seu login')
+ 
 
 if __name__ == '__main__':
     # Instancia o gerenciador de senhas para acessar as funções de login e gerenciamento de senhas
-    pm = GerenciadorDeSenhas()
+    banco = PasswordRepository()
+    pm = PasswordService(banco)
 
     while True:
-        print('(1) Criar conta\n(2) Entrar na conta\n(3) Criar nova senha\n(4) Ver senhas\n(5) Buscar senha\n(6) Sair')
+        print('(1) Criar conta\n(2) Entrar na conta\n(3) Criar nova senha\n(4) Ver senhas\n(5) Deletar\n(6) Atualizar Senha\n(7) Sair')
 
         opcao = int(input('Escolha uma opção: '))
 
@@ -153,13 +151,19 @@ if __name__ == '__main__':
                 site = input('Nome do site: ')
                 senha = input('Senha que será salva: ')
 
-                pm.criar_nova_senha(site, senha)
+                pm.new_password(site, senha)
             case 4:
-                pm.ver_senhas()
+                pm.show_passwords()
             case 5:
-                site = input('Digite o site que se deseja buscar: ')
-                pm.buscar_senha(site)
+                site = input('Nome do site: ')
+
+                pm.delete_password(site)
             case 6:
+                site = input('Site que deseja alterar a senha: ')
+                senha = input('Nova senha: ')
+
+                pm.update_password(site, senha)
+            case 7:
                 print('Saindo...')
                 pm.sair_conta()
                 break
