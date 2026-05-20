@@ -1,39 +1,15 @@
+from BancoSenhas import ConexaoBancoDeDados
 import base64 # Mexe com codificação e decodificação de dados
 import os # Mexe com arquivos e diretórios
 from cryptography.fernet import Fernet # Criptografia simétrica, cria uma chave para descriptografar e criptografar dados
 from cryptography.hazmat.primitives.kdf.argon2 import Argon2id # Derivação de chaves(KDF)
-from database import Password, db # Importa a classe Password e o banco de dados do arquivo database.py
 
-class ConexaoBancoDeDados:
-    def __init__(self):
-        db.connect() # Conecta ao banco de dados
-        db.create_tables([Password]) # Cria a tabela de senhas no banco de dados, caso ela ainda não exista
-
-    # CRUD(Create, Read, Update, Delete) para manipular os dados do banco de dados utilizando a classe Password
-
-    def adicionar_senha(self, title, password):
-        # Cria um novo registro de senha no banco de dados utilizando a classe Password
-        Password.create(title=title, password=password) 
-
-    def listar_senhas(self):
-        # Retorna todas as senhas armazenadas no banco de dados
-        return Password.select()
-    
-    def buscar_senha(self, title):
-        return Password.get_or_none(Password.title == title)
-    
-    def atualizar_senha(self, title, new_password):
-        ...
-
-    def deletar_senha(self, title):
-        ...
-
-        
+banco = ConexaoBancoDeDados()
 
 class GerenciadorDeSenhas:
     # Criação do constructor
-    def __init__(self, banco):
-        self.banco = banco
+    def __init__(self):
+        
         self.isLogged = False
         self.fernet = None
         
@@ -109,10 +85,9 @@ class GerenciadorDeSenhas:
     def ver_senhas(self):
         try:
             if self.isLogged:
-                senhas = self.banco.listar_senhas()
+                senhas = banco.listar_senhas()
 
-                for senha in senhas:
-                    print(f'{self.fernet.decrypt(senha.title.encode()).decode()}: {self.fernet.decrypt(senha.password.encode()).decode()}')
+                return senhas
             else:
                 print('Você não possui acesso, verifique seu login')
         except:
@@ -127,7 +102,7 @@ class GerenciadorDeSenhas:
             encrypted_password = self.fernet.encrypt(password.encode())
 
             # Salva a senha criptografada no banco de dados utilizando a função adicionar_senha da Classe ConexaoBancoDeDados
-            self.banco.adicionar_senha(encrypted_site.decode(), encrypted_password.decode())
+            banco.adicionar_senha(encrypted_site.decode(), encrypted_password.decode())
         else:
             print('Você não possui acesso, verifique seu login')
         
@@ -141,9 +116,9 @@ class GerenciadorDeSenhas:
                 # Descriptografa cada senha do banco de dados e compara com o site, buscando valor válido, se encontrar, retorna a senha descriptografada
 
                 # Provavelmente não é o melhor método, mas é um que funciona por agora
-                for item in self.banco.listar_senhas():
+                for item in banco.listar_senhas():
                     if self.fernet.decrypt(item.title.encode()).decode() == site:
-                        senha = self.fernet.decrypt(self.banco.buscar_senha(item.title).password.encode()).decode()
+                        senha = self.fernet.decrypt(banco.buscar_senha(item.title).password.encode()).decode()
 
                 # Se existir a senha, exibe ela
                 if senha is not None:
@@ -156,13 +131,11 @@ class GerenciadorDeSenhas:
             
         else:
             print('Você não possui acesso, verifique seu login')
-        
-        
-
-# Instancia o gerenciador de senhas para acessar as funções de login e gerenciamento de senhas
-pm = GerenciadorDeSenhas(ConexaoBancoDeDados())
 
 if __name__ == '__main__':
+    # Instancia o gerenciador de senhas para acessar as funções de login e gerenciamento de senhas
+    pm = GerenciadorDeSenhas()
+
     while True:
         print('(1) Criar conta\n(2) Entrar na conta\n(3) Criar nova senha\n(4) Ver senhas\n(5) Buscar senha\n(6) Sair')
 

@@ -1,5 +1,5 @@
 from tkinter import *
-import main
+from GerenciadorSenha import GerenciadorDeSenhas
 
 root = Tk()
 root.overrideredirect(False) # Não brinque com isso (impede que a janela seja redimensionada, movida ou fechada)
@@ -83,150 +83,58 @@ slider = Scale(root,
 slider.set(slider['from'])
 slider.pack(side=LEFT)
 
-
+cofre = GerenciadorDeSenhas()
+cofre.isLogged = True
+senhas = cofre.ver_senhas()
 
 # Funções
-def change_bloco(num):
+def change_bloco(id):
     mudar_bloco = Button(root,
                     text="Mudar bloco",
-                    command=lambda: mudar_bloco(num))
+                    command=lambda: mudar_bloco(id))
     mudar_bloco.place(x=850, y=700)
 
-# def bloco(id):
-#     passwd = "123456"
-#     root.clipboard_clear() # Limpa a área de transferência
-#     root.clipboard_append(passwd) # Copia a senha para a área de transferência
 
-#     # Criação do campo de título da anotação
-#     titulo_bloco = Text(root,**sample0)
-#     titulo_bloco.place(x=850, y=0)
-#     titulo_bloco.insert(0.0, titulo1)
+def bloco_anotacao(id, titulo, senha):
+    # Cópia das Senhas para a área de transferência
+    passwd = senha
+    root.clipboard_clear() # Limpa a área de transferência
+    root.clipboard_append(passwd) # Copia a senha para a senhas = GerenciadorDeSenhas.ver_senhas()área de transferência
 
-#     # Criação do campo de anotação
-#     anotacao = Text(root,**sample1)
-#     anotacao.place(x=850, y=98)
-#     anotacao.insert(0.0, "Senha do e-mail da USC")
-#     change_bloco(num)
+    # Criação do campo de título da anotação
+    titulo_bloco = Text(root,**sample0)
+    titulo_bloco.place(x=850, y=0)
+    titulo_bloco.insert(0.0, titulo)
 
-
-def bloco_anotacao(num):
-    if num == 0:
-        # Cópia das Senhas para a área de transferência
-        passwd = "123456"
-        root.clipboard_clear() # Limpa a área de transferência
-        root.clipboard_append(passwd) # Copia a senha para a área de transferência
-
-        # Criação do campo de título da anotação
-        titulo_bloco = Text(root,**sample0)
-        titulo_bloco.place(x=850, y=0)
-        titulo_bloco.insert(0.0, titulo1)
-
-        # Criação do campo de anotação
-        anotacao = Text(root,**sample1)
-        anotacao.place(x=850, y=98)
-        anotacao.insert(0.0, "Senha do e-mail da USC")
-        change_bloco(num)
-
-    elif num == 1:
-        passwd = "batata"
-        root.clipboard_clear() 
-        root.clipboard_append(passwd) 
-
-        titulo_bloco = Text(root,**sample0)
-        titulo_bloco.place(x=850, y=0)
-        titulo_bloco.insert(0.0, titulo2)
-
-        anotacao = Text(root,**sample1)
-        anotacao.place(x=850, y=98)
-        anotacao.insert(0.0, "Senha do e-mail pessoal")
-        change_bloco(num)
-
-    elif num == 2:
-        passwd = "valdomiro"
-        root.clipboard_clear() 
-        root.clipboard_append(passwd) 
-
-        titulo_bloco = Text(root,**sample0)
-        titulo_bloco.place(x=850, y=0)
-        titulo_bloco.insert(0.0, titulo3)
-
-        anotacao = Text(root,**sample1)
-        anotacao.place(x=850, y=98)
-        anotacao.insert(0.0, "Senha do Facebook")
-        change_bloco(num)
-
-    elif num == 3:
-        passwd = "destruição"
-        root.clipboard_clear() 
-        root.clipboard_append(passwd) 
-
-        titulo_bloco = Text(root,**sample0)
-        titulo_bloco.place(x=850, y=0)
-        titulo_bloco.insert(0.0, titulo4)
-
-        anotacao = Text(root,**sample1)
-        anotacao.place(x=850, y=98)
-        anotacao.insert(0.0, "Sensd")
-        change_bloco(num)
-
-    elif num == 4:
-        passwd = "bersek"
-        root.clipboard_clear() 
-        root.clipboard_append(passwd)
-
-        titulo_bloco = Text(root,**sample0)
-        titulo_bloco.place(x=850, y=0)
-        titulo_bloco.insert(0.0, titulo5)
-
-        anotacao = Text(root,**sample1)
-        anotacao.place(x=850, y=98)
-        anotacao.insert(0.0, "Senha da senha")
-        change_bloco(num)
-        
-
-
-
-
-
-
-
+    # Criação do campo de anotação
+    anotacao = Text(root,**sample1)
+    anotacao.place(x=850, y=98)
+    anotacao.insert(0.0, titulo)
+    change_bloco(id)
 
 
 # Blocos botões
+def card(id, titulo, senha):
+    card_anotacao = Button(root,
+                         text=titulo,
+                         **sample2,
+                         command=lambda: bloco_anotacao(id, titulo, senha))
 
-bloco1 = Button(root,
-            text=titulo1,
-            **sample2,
-            command=lambda: bloco_anotacao(0))
+    card_anotacao.place(x=120, y=50 * (id * 2))
 
-bloco2 = Button(root,
-            text=titulo2,
-            **sample2,
-            command=lambda: bloco_anotacao(1))
 
-bloco3 = Button(root,
-            text=titulo3,
-            **sample2,
-            command=lambda: bloco_anotacao(2))
+for senha in senhas:
+    card(senha.id, senha.title, senha.password)
 
-bloco4 = Button(root,
-            text=titulo4,
-            **sample2,
-            command=lambda: bloco_anotacao(3))
-
-bloco5 = Button(root,
-            text=titulo5,
-            **sample2,
-            command=lambda: bloco_anotacao(4))
 
 
 # Posicionamento dos blocos
 
-bloco1.place(x=120, y=50)
-bloco2.place(x=120, y=200)
-bloco3.place(x=120, y=350)
-bloco4.place(x=120, y=500)
-bloco5.place(x=120, y=650)
+# bloco1.place(x=120, y=50)
+# bloco2.place(x=120, y=200)
+# bloco3.place(x=120, y=350)
+# bloco4.place(x=120, y=500)
+# bloco5.place(x=120, y=650)
 
 
 
