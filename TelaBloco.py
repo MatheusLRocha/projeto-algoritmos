@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 
-def open_window(id):
+def open_window(id, on_close=None):
     root = Tk()
     root.overrideredirect(False) # Não brinque com isso (impede que a janela seja redimensionada, movida ou fechada)
     root.title("PasSword") # Título da janela
@@ -50,6 +50,15 @@ def open_window(id):
                 "highlightbackground":"#141f29",
                 "highlightcolor":"#141f29",
                 "highlightthickness":0
+            }
+    
+    samplebutton = {
+                "font": ("Montserrat", 20, "bold"),
+                "bg": "#141f29",
+                "fg": "#a8c7e4",
+                "bd": 0,
+                "width": 10,
+                "height": 1,
             }
     if (id==None):
 
@@ -141,3 +150,25 @@ def open_window(id):
         new_block_notes = Text(**sampletext2)
         new_block_notes.insert("1.0",f"Anotações pré-selecionadas do bloco {id}")
         new_block_notes.place(x=240, y=382)
+
+    # Função alteradora de mudanças e volta para a tela principal
+    def accept_changes(id=None):
+            variavel_titulo = new_block_title.get("1.0", "end-1c")
+            variavel_senha = new_block_passwd.get("1.0", "end-1c")
+            variavel_notas = new_block_notes.get("1.0", "end-1c")
+            root.destroy()
+            if callable(on_close):
+                try:
+                    on_close()
+                except Exception:
+                    pass
+
+    # Botão de alterar mudanças
+    accept_changes_button = Button(root,
+                                text="Alterar bloco",
+                                **samplebutton,
+                                command=lambda id=id: accept_changes(id))
+    accept_changes_button.place(x=25, y=600)
+    
+    
+    

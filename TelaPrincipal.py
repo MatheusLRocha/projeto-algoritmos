@@ -102,15 +102,18 @@ def abrir_tela(pm):
 
 
 
-    # Funções
+    # Ativa o botão de adicionar um novo bloco
     def add_card():
         root.destroy() # Fecha a janela atual
-        open_window(None)# Importa o arquivo da tela principal (precisa ser aberta como pasta para funcionar)
+        open_window(None, lambda: abrir_tela(pm))# Importa o arquivo da tela principal (precisa ser aberta como pasta para funcionar)
+    
+    # Ativa o botão de alterar um bloco
     def change_card(id):
         root.destroy()
-        open_window(id)
+        open_window(id, lambda: abrir_tela(pm))
 
 
+    # Modelo instanciável dos blocos
     def bloco_anotacao(id, titulo, senha_criptografada):
         senha = pm.fernet.decrypt(senha_criptografada.encode()).decode()
 
@@ -131,7 +134,7 @@ def abrir_tela(pm):
         
 
 
-    # Blocos botões
+    # Botão de adicionar um bloco
     add_card_block = Button(root,
                             text="+",
                             **samplebuttonplus,
