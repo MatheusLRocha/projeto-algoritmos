@@ -118,12 +118,10 @@ class PasswordService:
         else:
             print('Você não possui acesso, verifique seu login')
     
-    def delete_password(self, title):
+    def delete_password(self, id):
         if self.isLogged:
             try:
-                for item in self.banco.list():
-                    if self.fernet.decrypt(item.title.encode()).decode() == title:
-                        self.banco.delete(item.title)
+                self.banco.delete(id)
             except:
                 print('Ainda não há um arquivo de senhas criado')
         else:
