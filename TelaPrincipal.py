@@ -66,7 +66,7 @@ def abrir_tela(pm):
     }
 
     samplebuttonedit = {
-        "font": ("Montserrat", 22, "bold"),
+        "font": ("Montserrat", 11, "bold"),
         "width": 3,
         "height": 1,
         "fg": "#a8c7e4",
@@ -107,6 +107,11 @@ def abrir_tela(pm):
         root.destroy() # Fecha a janela atual
         open_window(None, pm, None, None, lambda: abrir_tela(pm))# Importa o arquivo da tela principal (precisa ser aberta como pasta para funcionar)
     
+
+
+    
+    
+
     # Ativa o botão de alterar um bloco
     def change_card(id, title, password):
         root.destroy()
@@ -142,8 +147,6 @@ def abrir_tela(pm):
     add_card_block.place(x=125, y=10)
 
 
-
-
     # Instancia todas as senhas presentes
     def card(id, titulo, senha):
         card_anotacao = Button(root,
@@ -152,10 +155,22 @@ def abrir_tela(pm):
                             command=lambda: bloco_anotacao(titulo, senha))
         thispace = 100 + space
         card_anotacao.place(x=120, y=thispace)
+        # Botão editar bloco
         edit_block = Button(root,text=">",
                     **samplebuttonedit,
                     command=lambda:change_card(id, titulo, senha))
-        edit_block.place(x=45, y=thispace+10)
+        edit_block.place(x=45, y=thispace)
+        
+        # Função de deletar
+        def delete_card(id):
+            pm.show_passwords(id).destroy
+            
+        # Bloco de deletar
+        delete_card_block = Button(root,
+                                text="-",
+                                **samplebuttonedit,
+                                command=delete_card)
+        delete_card_block.place(x=45, y=thispace+50)
 
 
 
