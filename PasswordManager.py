@@ -3,6 +3,7 @@ import base64 # Mexe com codificação e decodificação de dados
 import os # Mexe com arquivos e diretórios
 from cryptography.fernet import Fernet # Criptografia simétrica, cria uma chave para descriptografar e criptografar dados
 from cryptography.hazmat.primitives.kdf.argon2 import Argon2id # Derivação de chaves(KDF)
+import random # biblioteca para aleatorizar os valores para senha aleatória
 
 class PasswordService:
     # Criação do constructor
@@ -127,6 +128,18 @@ class PasswordService:
                 print('Ainda não há um arquivo de senhas criado')
         else:
             print('Você não possui acesso, verifique seu login')
+
+    def random_password(self):
+        lowercase_caracters = 'abcdefghijklmnopqrstuvwxyz'
+        uppercase_caracters = lowercase_caracters.upper()
+        special_caracters = "!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
+        numbers = '0123456789'
+
+        all_caracters = lowercase_caracters + uppercase_caracters + special_caracters + numbers
+
+        # join() permite juntar todos os itens de um iterável e juntá-los em uma string
+        password = ''.join(random.choices(all_caracters, k=20))
+
 
 
 if __name__ == '__main__':
