@@ -87,7 +87,8 @@ def open_window(id, pm, title=None, password=None, on_close=None):
 
         # Botão gerador de senhas
         new_generated = Button(text="Gerar senha aleatória",
-                            **sampleh2)
+                            **sampleh2,
+                            command=lambda:new_block_passwd.insert("1.0", pm.random_password()))
         new_generated.place(x=150, y=270)
 
 
@@ -131,10 +132,14 @@ def open_window(id, pm, title=None, password=None, on_close=None):
         new_block_passwd.insert("1.0",f"{decrypted_password}")
         new_block_passwd.place(x=240, y=190)
 
+        def deletar_senha_antiga():
+            new_block_passwd.delete("1.0", "end-1c")
+            new_block_passwd.insert("1.0", pm.random_password())
 
         # Botão gerador de senhas
         new_generated = Button(text="Gerar senha aleatória",
-                            **sampleh2)
+                            **sampleh2,
+                            command=lambda:deletar_senha_antiga())
         new_generated.place(x=150, y=270)
 
 
