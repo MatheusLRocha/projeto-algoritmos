@@ -106,13 +106,12 @@ class PasswordService:
         except:
             print('Ainda não há um arquivo de senhas criado')
 
-    def update_password(self, title, new_password):
+    def update_password(self, id, new_password):
         if self.isLogged:
             try:
                 encrypted_new_password = self.fernet.encrypt(new_password.encode())
-                for item in self.banco.list():
-                    if self.fernet.decrypt(item.title.encode()).decode() == title:
-                        self.banco.update(item.title, encrypted_new_password.decode())
+                
+                self.banco.update(id, encrypted_new_password.decode()) # podemos atulizar a criptografia do titulo também(opcional)
             except:
                 print('Ainda não há um arquivo de senhas criado')
         else:
