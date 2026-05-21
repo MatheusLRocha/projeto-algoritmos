@@ -25,6 +25,7 @@ class PasswordRepository:
         senha.delete_instance()
 
     def new_register(self):
+        # Deleta completamente todos os dados da tabela para criar uma nova de acordo com o cadastro
         Password.delete().execute()
 
     
