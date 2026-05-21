@@ -128,7 +128,7 @@ class PasswordService:
                 print('Ainda não há um arquivo de senhas criado')
         else:
             print('Você não possui acesso, verifique seu login')
- 
+
 
 if __name__ == '__main__':
     # Instancia o gerenciador de senhas para acessar as funções de login e gerenciamento de senhas
