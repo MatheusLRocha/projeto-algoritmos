@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 
-def open_window(id, on_close=None):
+def open_window(id, pm, title=None, password=None, on_close=None):
     root = Tk()
     root.overrideredirect(False) # Não brinque com isso (impede que a janela seja redimensionada, movida ou fechada)
     root.title("PasSword") # Título da janela
@@ -112,7 +112,7 @@ def open_window(id, on_close=None):
         new_title.place(x=30, y=50)
         # Título criado
         new_block_title = Text(**sampletext2)
-        new_block_title.insert("1.0",f"Título pré-selecionado do bloco id{id}")
+        new_block_title.insert("1.0",f"{title}")
         new_block_title.place(x=220, y=50)
 
 
@@ -120,6 +120,7 @@ def open_window(id, on_close=None):
         sep1 = ttk.Separator(root, orient="horizontal")
         sep1.place(x=0, y=145, width=1200)
 
+        decrypted_password = pm.fernet.decrypt(password.encode()).decode()
 
         # Senhas
         new_passwd = Label(text="Senha:",
@@ -127,7 +128,7 @@ def open_window(id, on_close=None):
         new_passwd.place(x=50, y=190)
         # Senha criada
         new_block_passwd = Text(**sampletext2)
-        new_block_passwd.insert("1.0",f"Senha pré-selecionada do bloco id{id}")
+        new_block_passwd.insert("1.0",f"{decrypted_password}")
         new_block_passwd.place(x=240, y=190)
 
 
@@ -156,6 +157,12 @@ def open_window(id, on_close=None):
             variavel_titulo = new_block_title.get("1.0", "end-1c")
             variavel_senha = new_block_passwd.get("1.0", "end-1c")
             variavel_notas = new_block_notes.get("1.0", "end-1c")
+
+            if id is not None:
+                pm.update_password(id, variavel_senha)
+            else:
+                pm.new_password(variavel_titulo, variavel_senha)    
+            
             root.destroy()
             if callable(on_close):
                 try:

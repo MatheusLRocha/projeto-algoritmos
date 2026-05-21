@@ -15,8 +15,8 @@ class PasswordRepository:
         # Retorna todas as senhas armazenadas no banco de dados
         return Password.select()
     
-    def update(self, title, new_password):
-        senha = Password.get(Password.title == title)
+    def update(self, id, new_password):
+        senha = Password.get(Password.id == id)
         senha.password = new_password
         senha.save()
 

@@ -105,16 +105,16 @@ def abrir_tela(pm):
     # Ativa o botão de adicionar um novo bloco
     def add_card():
         root.destroy() # Fecha a janela atual
-        open_window(None, lambda: abrir_tela(pm))# Importa o arquivo da tela principal (precisa ser aberta como pasta para funcionar)
+        open_window(None, pm, None, None, lambda: abrir_tela(pm))# Importa o arquivo da tela principal (precisa ser aberta como pasta para funcionar)
     
     # Ativa o botão de alterar um bloco
-    def change_card(id):
+    def change_card(id, title, password):
         root.destroy()
-        open_window(id, lambda: abrir_tela(pm))
+        open_window(id, pm, title, password, lambda: abrir_tela(pm))
 
 
     # Modelo instanciável dos blocos
-    def bloco_anotacao(id, titulo, senha_criptografada):
+    def bloco_anotacao(titulo, senha_criptografada):
         senha = pm.fernet.decrypt(senha_criptografada.encode()).decode()
 
         # Cópia das Senhas para a área de transferência
@@ -130,7 +130,7 @@ def abrir_tela(pm):
         # Criação do campo de anotação
         anotacao = Text(root,**sampleh2)
         anotacao.place(x=850, y=98)
-        anotacao.insert(0.0, senha)
+        anotacao.insert(0.0, passwd)
         
 
 
@@ -149,12 +149,12 @@ def abrir_tela(pm):
         card_anotacao = Button(root,
                             text=titulo,
                             **samplebutton,
-                            command=lambda: bloco_anotacao(id, titulo, senha))
+                            command=lambda: bloco_anotacao(titulo, senha))
         thispace = 100 + space
         card_anotacao.place(x=120, y=thispace)
         edit_block = Button(root,text=">",
                     **samplebuttonedit,
-                    command=lambda:change_card(id))
+                    command=lambda:change_card(id, titulo, senha))
         edit_block.place(x=45, y=thispace+10)
 
 
