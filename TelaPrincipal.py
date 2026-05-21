@@ -1,4 +1,5 @@
 from tkinter import *
+from TelaBloco import open_window
 
 def abrir_tela(pm):
     root = Tk()
@@ -14,7 +15,7 @@ def abrir_tela(pm):
     # Modelo de formatação
 
     # Título
-    sample0 = {
+    sampleh1 = {
         "font":("Montserrat", 24, "bold"),
         "width":16,
         "height":2,
@@ -27,10 +28,10 @@ def abrir_tela(pm):
     }
 
     # Anotação
-    sample1 = {
+    sampleh2 = {
         "font":("Montserrat", 15, "bold"),
         "width":30,
-        "height":20,
+        "height":30,
         "borderwidth":0,
         "fg":"#a8c7e4",
         "bg":"#141f29",
@@ -40,7 +41,7 @@ def abrir_tela(pm):
     }
 
     # Botões
-    sample2 = {
+    samplebutton = {
         "font": ("Montserrat", 20, "bold"),
         "width": 40,
         "height": 2,
@@ -52,9 +53,9 @@ def abrir_tela(pm):
         "highlightcolor": "#a8c7e4"
     }
 
-    sample3 = {
+    samplebuttonplus = {
         "font": ("Montserrat", 22, "bold"),
-        "width": 4,
+        "width": 37,
         "height": 1,
         "fg": "#a8c7e4",
         "bg": "#141f29",
@@ -62,6 +63,18 @@ def abrir_tela(pm):
         "activeforeground": "#a8c7e4",
         "bd": 0,
         "highlightcolor": "#a8c7e4"
+    }
+
+    samplebuttonedit = {
+        "font": ("Montserrat", 22, "bold"),
+        "width": 3,
+        "height": 1,
+        "fg": "#a8c7e4",
+        "bg": "#141f29",
+        "activebackground": "#141f29",
+        "activeforeground": "#a8c7e4",
+        "bd": 5,
+        "highlightcolor": None
     }
 
 
@@ -92,14 +105,10 @@ def abrir_tela(pm):
     # Funções
     def add_card():
         root.destroy() # Fecha a janela atual
-
-        import TelaBloco # Importa o arquivo da tela principal (precisa ser aberta como pasta para funcionar)
-    def change_bloco(id):
-        mudar_bloco = Button(root,
-                        text="Mudar bloco",
-                        command=lambda: mudar_bloco(id))
-        mudar_bloco.place(x=850, y=700)
-
+        open_window(None)# Importa o arquivo da tela principal (precisa ser aberta como pasta para funcionar)
+    def change_card(id):
+        root.destroy()
+        open_window(id)
 
 
     def bloco_anotacao(id, titulo, senha_criptografada):
@@ -111,23 +120,23 @@ def abrir_tela(pm):
         root.clipboard_append(passwd) # Copia a senha para a senhas = GerenciadorDeSenhas.ver_senhas()área de transferência
 
         # Criação do campo de título da anotação
-        titulo_bloco = Text(root,**sample0)
+        titulo_bloco = Text(root,**sampleh1)
         titulo_bloco.place(x=850, y=0)
         titulo_bloco.insert(0.0, titulo)
 
         # Criação do campo de anotação
-        anotacao = Text(root,**sample1)
+        anotacao = Text(root,**sampleh2)
         anotacao.place(x=850, y=98)
         anotacao.insert(0.0, senha)
-        change_bloco(id)
+        
 
 
     # Blocos botões
     add_card_block = Button(root,
                             text="+",
-                            **sample3,
+                            **samplebuttonplus,
                             command=add_card)
-    add_card_block.place(x=30, y=50)
+    add_card_block.place(x=125, y=10)
 
 
 
@@ -136,10 +145,14 @@ def abrir_tela(pm):
     def card(id, titulo, senha):
         card_anotacao = Button(root,
                             text=titulo,
-                            **sample2,
+                            **samplebutton,
                             command=lambda: bloco_anotacao(id, titulo, senha))
-
-        card_anotacao.place(x=120, y=50 + (space))
+        thispace = 100 + space
+        card_anotacao.place(x=120, y=thispace)
+        edit_block = Button(root,text=">",
+                    **samplebuttonedit,
+                    command=lambda:change_card(id))
+        edit_block.place(x=45, y=thispace+10)
 
 
 
