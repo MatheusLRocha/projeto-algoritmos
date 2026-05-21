@@ -20,8 +20,8 @@ class PasswordRepository:
         senha.password = new_password
         senha.save()
 
-    def delete(self, title):
-        senha = Password.get(Password.title == title)
+    def delete(self, id):
+        senha = Password.get(Password.id == id)
         senha.delete_instance()
 
     def new_register(self):

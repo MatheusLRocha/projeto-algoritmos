@@ -106,12 +106,9 @@ def abrir_tela(pm):
     def add_card():
         root.destroy() # Fecha a janela atual
         open_window(None, pm, None, None, lambda: abrir_tela(pm))# Importa o arquivo da tela principal (precisa ser aberta como pasta para funcionar)
-    
-
 
     
     
-
     # Ativa o botão de alterar um bloco
     def change_card(id, title, password):
         root.destroy()
@@ -161,15 +158,16 @@ def abrir_tela(pm):
                     command=lambda:change_card(id, titulo, senha))
         edit_block.place(x=45, y=thispace)
         
+        
         # Função de deletar
         def delete_card(id):
-            pm.show_passwords(id).destroy
+            pm.delete_password(id)
             
         # Bloco de deletar
         delete_card_block = Button(root,
                                 text="-",
                                 **samplebuttonedit,
-                                command=delete_card)
+                                command=lambda:delete_card(id))
         delete_card_block.place(x=45, y=thispace+50)
 
 
