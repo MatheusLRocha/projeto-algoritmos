@@ -136,7 +136,10 @@ class PasswordService:
         all_caracters = lowercase_caracters + uppercase_caracters + special_caracters + numbers
 
         # join() permite juntar todos os itens de um iterável e juntá-los em uma string
-        password = ''.join(random.choices(all_caracters, k=20))
+        rpassword = ''.join(random.choices(all_caracters, k=20))
+
+        return rpassword
+        
 
 
 
