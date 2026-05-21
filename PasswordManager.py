@@ -28,7 +28,7 @@ class PasswordService:
         return base64.urlsafe_b64encode(kdf.derive(master_password.encode()))
 
     # O usuário precisa indicar onde vai salvar a senha mais importante dele
-    def criar_conta(self, passphrase):
+    def create_account(self, passphrase):
         # salt é gerado aleatoriamente
         salt = os.urandom(16)
 
@@ -47,11 +47,13 @@ class PasswordService:
             safe_text = self.fernet.encrypt(b'Cofre criado')
             f.write(safe_text)
 
+        print('Conta criada com sucesso!')
+
         # Após criar a conta, o usuário já está logado
         self.isLogged = True
 
     # Verifica se o usuário tem uma conta
-    def login_conta(self, master_password):
+    def login_account(self, master_password):
         # Pega o salt armazenado
         with open('salt.txt', 'rb') as f:
             salt = f.read()

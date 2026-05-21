@@ -1,6 +1,7 @@
 from tkinter import *
 from PasswordManager import PasswordService
 from PasswordBank import PasswordRepository
+import os
 
 
 root = Tk() # Base TkInter
@@ -35,7 +36,13 @@ pasSword.place(x=90,y=100) # Posicionamento do título
 
 
 # Seleciona se é um usuário primário ou já cadastrado
-serUsuario = True
+serUsuario = False
+
+# Procura na pasta do projeto pelo arquivo de autenticação para saber se houve já um cadastro feito
+for _, _, filenames in os.walk(os.getcwd()): # "_" indica uma variável descartável/ignorada, é usada quando o valor não será utilizado
+    if 'autenticacao.txt' in filenames:
+        serUsuario = True
+        break
 
 if serUsuario == True:
     passw = Label(root,
@@ -57,7 +64,7 @@ if serUsuario == True:
     # Funções
     def login():
 
-        if pm.login_conta(user_passw.get()): # Verifica se o usuário e a senha estão corretos (nesse caso, ambos são "admin")
+        if pm.login_account(user_passw.get()): # Verifica se o usuário e a senha estão corretos (nesse caso, ambos são "admin")
             root.destroy() # Fecha a janela atual
 
             import TelaPrincipal # Importa o arquivo da tela principal (precisa ser aberta como pasta para funcionar)
@@ -103,12 +110,11 @@ else:
 
     # Função de primeiro login (Desconfigurada desfuncional)
     def signup():
+        pm.create_account(user_newpassw.get())
+        root.destroy() # Fecha a janela atual
 
-        if pm.login_conta(user_passw.get()): # Verifica se o usuário e a senha estão corretos (nesse caso, ambos são "admin")
-            root.destroy() # Fecha a janela atual
-
-            import TelaPrincipal # Importa o arquivo da tela principal (precisa ser aberta como pasta para funcionar)
-            TelaPrincipal.abrir_tela(pm)
+        import TelaPrincipal # Importa o arquivo da tela principal (precisa ser aberta como pasta para funcionar)
+        TelaPrincipal.abrir_tela(pm)
 
 
 
