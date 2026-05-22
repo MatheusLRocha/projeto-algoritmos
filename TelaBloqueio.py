@@ -36,15 +36,15 @@ pasSword.place(x=90,y=100) # Posicionamento do título
 
 
 # Seleciona se é um usuário primário ou já cadastrado
-serUsuario = False
+isUser = False
 
 # Procura na pasta do projeto pelo arquivo de autenticação para saber se houve já um cadastro feito
 for _, _, filenames in os.walk(os.getcwd()): # "_" indica uma variável descartável/ignorada, é usada quando o valor não será utilizado
     if 'autenticacao.txt' in filenames:
-        serUsuario = True
+        isUser = True
         break
 
-if serUsuario == True:
+if isUser == True:
     passw = Label(root,
                 text="Senha",
                 font=("Montserrat",22,"bold"),
@@ -108,7 +108,7 @@ else:
     user_newpassw.place(x=72,y=450) # Posicionamento do campo de entrada para a senha
 
 
-    # Função de primeiro login (Desconfigurada desfuncional)
+    # Função de primeiro login
     def signup():
         pm.create_account(user_newpassw.get())
         root.destroy() # Fecha a janela atual
