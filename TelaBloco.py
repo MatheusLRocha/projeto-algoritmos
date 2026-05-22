@@ -159,14 +159,14 @@ def open_window(id, pm, title=None, password=None, on_close=None):
 
     # Função alteradora de mudanças e volta para a tela principal
     def accept_changes(id=None):
-            variavel_titulo = new_block_title.get("1.0", "end-1c")
-            variavel_senha = new_block_passwd.get("1.0", "end-1c")
+            new_title = new_block_title.get("1.0", "end-1c")
+            new_password = new_block_passwd.get("1.0", "end-1c")
             variavel_notas = new_block_notes.get("1.0", "end-1c")
 
             if id is not None:
-                pm.update_password(id, variavel_senha)
+                pm.update_password(id, new_password)
             else:
-                pm.new_password(variavel_titulo, variavel_senha)    
+                pm.new_password(new_title, new_password)    
             
             root.destroy()
             if callable(on_close):
