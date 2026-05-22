@@ -181,6 +181,3 @@ def open_window(id, pm, title=None, password=None, on_close=None):
                                 **samplebutton,
                                 command=lambda id=id: accept_changes(id))
     accept_changes_button.place(x=25, y=600)
-    
-    
-    

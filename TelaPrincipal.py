@@ -123,6 +123,7 @@ def abrir_tela(pm):
         passwd = senha
         root.clipboard_clear() # Limpa a área de transferência
         root.clipboard_append(passwd) # Copia a senha para a senhas = GerenciadorDeSenhas.ver_senhas()área de transferência
+        # root.after(15000, lambda:root.clipboard_clear()) # Limpa o clipboard após 15 segundos, tornando mais seguro contra outros apps lerem ele
 
         # Criação do campo de título da anotação
         titulo_bloco = Text(root,**sampleh1)
