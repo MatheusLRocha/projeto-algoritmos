@@ -116,8 +116,8 @@ def abrir_tela(pm):
 
 
     # Modelo instanciável dos blocos
-    def bloco_anotacao(titulo, senha_criptografada):
-        senha = pm.fernet.decrypt(senha_criptografada.encode()).decode()
+    def notepad(title, encrypted_password):
+        senha = pm.fernet.decrypt(encrypted_password.encode()).decode()
 
         # Cópia das Senhas para a área de transferência
         passwd = senha
@@ -127,7 +127,7 @@ def abrir_tela(pm):
         # Criação do campo de título da anotação
         titulo_bloco = Text(root,**sampleh1)
         titulo_bloco.place(x=850, y=0)
-        titulo_bloco.insert(0.0, titulo)
+        titulo_bloco.insert(0.0, title)
 
         # Criação do campo de anotação
         anotacao = Text(root,**sampleh2)
@@ -145,17 +145,17 @@ def abrir_tela(pm):
 
 
     # Instancia todas as senhas presentes
-    def card(id, titulo, senha):
+    def card(id, title, password):
         card_anotacao = Button(root,
-                            text=titulo,
+                            text=title,
                             **samplebutton,
-                            command=lambda: bloco_anotacao(titulo, senha))
+                            command=lambda: notepad(title, password))
         thispace = 100 + space
         card_anotacao.place(x=120, y=thispace)
         # Botão editar bloco
         edit_block = Button(root,text=">",
                     **samplebuttonedit,
-                    command=lambda:change_card(id, titulo, senha))
+                    command=lambda:change_card(id, title, password))
         edit_block.place(x=45, y=thispace)
         
         
@@ -173,27 +173,15 @@ def abrir_tela(pm):
 
 
     # Prepara a instanciação das senhas
-    senhas = pm.show_passwords()
+    encrypted_passwords = pm.show_passwords()
     space=0
-    for senha in senhas:
-        title = senha.title
-        password = senha.password
+    for item in encrypted_passwords:
+        title = item.title
+        encrypted_password = item.password
 
         decrypt_title = pm.fernet.decrypt(title.encode()).decode()
 
-        card(senha.id, decrypt_title, password)
+        card(item.id, decrypt_title, encrypted_password)
         space+=130
-
-
-
-    # Posicionamento dos blocos
-
-    # bloco1.place(x=120, y=50)
-    # bloco2.place(x=120, y=200)
-    # bloco3.place(x=120, y=350)
-    # bloco4.place(x=120, y=500)
-    # bloco5.place(x=120, y=650)
-
-
 
     root.mainloop()
