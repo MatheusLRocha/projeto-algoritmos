@@ -1,9 +1,11 @@
 from PasswordBank import PasswordRepository
 import base64 # Mexe com codificação e decodificação de dados
 import os # Mexe com arquivos e diretórios
-from cryptography.fernet import Fernet # Criptografia simétrica, cria uma chave para descriptografar e criptografar dados
+from cryptography.fernet import Fernet, InvalidToken # Criptografia simétrica, cria uma chave para descriptografar e criptografar dados
 from cryptography.hazmat.primitives.kdf.argon2 import Argon2id # Derivação de chaves(KDF)
 import random # biblioteca para aleatorizar os valores para senha aleatória
+from time import sleep # sleep permite criar um temporizador entre as tentativas de login. Serve para atrasar em caso de brute force
+from peewee import OperationalError, DoesNotExist # Validações de erros da biblioteca peewee
 
 class PasswordService:
     # Criação do constructor
@@ -54,31 +56,45 @@ class PasswordService:
 
     # Verifica se o usuário tem uma conta
     def login_account(self, master_password):
-        # Pega o salt armazenado
-        with open('salt.txt', 'rb') as f:
-            salt = f.read()
-
-        # Gera a chave de criptografia a partir da senha mestre e do salt, e coloca ela no fernet
-        key = self.generate_key(master_password, salt)
-        self.fernet = Fernet(key)
-
-        # Pega a autenticação criptografada armazenada
-        with open('autenticacao.txt', 'rb') as f:
-            encrypted_data = f.readline()
-
         try:
-            # Descriptografa a autenticação para verificar se a senha mestre está correta
-            self.fernet.decrypt(encrypted_data)
-
-            print('Login feito com sucesso!')
-
-            self.isLogged = True
-            return self.isLogged
-        except:
-            print('Login negado')
-
+            # Pega o salt armazenado
+            with open('salt.txt', 'rb') as f:
+                salt = f.read()
+        except FileNotFoundError:
+            print('Arquivo de salt não encontrado')
             self.isLogged = False
-            return self.isLogged
+        else:
+            try:
+                # Pega a autenticação criptografada armazenada
+                with open('autenticacao.txt', 'rb') as f:
+                    encrypted_data = f.readline()
+            except FileNotFoundError:
+                print('Arquivo de autenticação não encontrado')
+                self.isLogged = False
+            else:
+                # Verifica se a senha está correta
+                try:
+                    # Gera a chave de criptografia a partir da senha mestre e do salt, e coloca ela no fernet
+                    key = self.generate_key(master_password, salt)
+                    self.fernet = Fernet(key)
+
+                    # Descriptografa a autenticação para verificar se a senha mestre está correta
+                    self.fernet.decrypt(encrypted_data)
+                except InvalidToken: 
+                    # InvalidToken ocorre quando ao tentar gerar a chave e abrir o cofre, o valor passado não é o mesmo que foi usado para criá-la
+                    print('Chave inválida, erro ao tentar descriptografar com a senha passada!')
+                    sleep(3) # Temporizador de 3 segundos
+                    print('Login negado')
+                    
+                    self.isLogged = False
+                else:
+                    print('Login feito com sucesso!')
+
+                    self.isLogged = True
+        return self.isLogged
+       
+
+        
 
     # Sai da conta e fecha o aplicativo
     def sair_conta(self):
@@ -99,15 +115,14 @@ class PasswordService:
             
     # Mostra todas as senhas criadas se estiver logado
     def show_passwords(self):
-        try:
-            if self.isLogged:
+        if self.isLogged:
+            try:
                 encrypted_passwords = self.banco.list()
-
                 return encrypted_passwords
-            else:
-                print('Você não possui acesso, verifique seu login')
-        except:
-            print('Ainda não há um arquivo de senhas criado')
+            except OperationalError:
+                print('Ainda não há uma tabela ou banco criados.')
+        else:
+            print('Você não possui acesso, verifique seu login')
 
     def update_password(self, id, new_password):
         if self.isLogged:
@@ -115,8 +130,8 @@ class PasswordService:
                 encrypted_new_password = self.fernet.encrypt(new_password.encode())
                 
                 self.banco.update(id, encrypted_new_password.decode()) # podemos atulizar a criptografia do titulo também(opcional)
-            except:
-                print('Ainda não há um arquivo de senhas criado')
+            except DoesNotExist:
+                print('Consulta não encontrada no banco de dados')
         else:
             print('Você não possui acesso, verifique seu login')
     
@@ -124,12 +139,13 @@ class PasswordService:
         if self.isLogged:
             try:
                 self.banco.delete(id)
-            except:
-                print('Ainda não há um arquivo de senhas criado')
+            except DoesNotExist:
+                print('Consulta não encontrada no banco de dados')
         else:
             print('Você não possui acesso, verifique seu login')
 
     def random_password(self):
+        # Existe um jeito melhor utilizando uma biblioteca, mas aqui por enquanto fica no modo manual
         lowercase_caracters = 'abcdefghijklmnopqrstuvwxyz'
         uppercase_caracters = lowercase_caracters.upper()
         special_caracters = "!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
