@@ -92,9 +92,6 @@ class PasswordService:
 
                     self.isLogged = True
         return self.isLogged
-       
-
-        
 
     # Sai da conta e fecha o aplicativo
     def sair_conta(self):
