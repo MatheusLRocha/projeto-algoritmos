@@ -3,9 +3,10 @@ import base64 # Mexe com codificação e decodificação de dados
 import os # Mexe com arquivos e diretórios
 from cryptography.fernet import Fernet, InvalidToken # Criptografia simétrica, cria uma chave para descriptografar e criptografar dados
 from cryptography.hazmat.primitives.kdf.argon2 import Argon2id # Derivação de chaves(KDF)
-import random # biblioteca para aleatorizar os valores para senha aleatória
 from time import sleep # sleep permite criar um temporizador entre as tentativas de login. Serve para atrasar em caso de brute force
 from peewee import OperationalError, DoesNotExist # Validações de erros da biblioteca peewee
+import secrets # Biblioteca para aleatorizar os valores para senha aleatória segura(Melhor para criptografia que o random)
+import string # Biblioteca de string para capturar letras, números e símbolos de forma mais fácil
 
 class PasswordService:
     # Criação do constructor
@@ -15,7 +16,7 @@ class PasswordService:
         self.fernet = None
         
     # Gera chave de criptografia com base na senha mestre e salt.    
-    def generate_key(self, master_password, salt):
+    def generate_key(self, master_password: str, salt: bytes):
         # Código feito a partir da documentação do fernet e do argon2id, ambos da biblioteca cryptography
         kdf = Argon2id(
             salt=salt,
@@ -32,7 +33,7 @@ class PasswordService:
     # O usuário precisa indicar onde vai salvar a senha mais importante dele
     def create_account(self, passphrase):
         # salt é gerado aleatoriamente
-        salt = os.urandom(16)
+        salt = os.urandom(16) # urandom gera bytes aleatórios para criptografia
 
         # Gera a chave e criptografia e coloca ela no fernet
         key = self.generate_key(passphrase, salt)
@@ -42,10 +43,10 @@ class PasswordService:
         self.banco.new_register()
 
         # Cria um arquivo para salvar o salt e outro para salvar a senha criptografada de autenticação
-        with open('salt.txt', 'wb') as f:
+        with open('salt.bin', 'wb') as f: # .bin indica que é conteúdo binário
             f.write(salt)
 
-        with open('autenticacao.txt', 'wb') as f:
+        with open('autenticacao.token', 'wb') as f: # .token indica que é conteúdo de autenticação
             safe_text = self.fernet.encrypt(b'Cofre criado')
             f.write(safe_text)
 
@@ -58,7 +59,7 @@ class PasswordService:
     def login_account(self, master_password):
         try:
             # Pega o salt armazenado
-            with open('salt.txt', 'rb') as f:
+            with open('salt.bin', 'rb') as f:
                 salt = f.read()
         except FileNotFoundError:
             print('Arquivo de salt não encontrado')
@@ -66,7 +67,7 @@ class PasswordService:
         else:
             try:
                 # Pega a autenticação criptografada armazenada
-                with open('autenticacao.txt', 'rb') as f:
+                with open('autenticacao.token', 'rb') as f:
                     encrypted_data = f.readline()
             except FileNotFoundError:
                 print('Arquivo de autenticação não encontrado')
@@ -142,16 +143,10 @@ class PasswordService:
             print('Você não possui acesso, verifique seu login')
 
     def random_password(self):
-        # Existe um jeito melhor utilizando uma biblioteca, mas aqui por enquanto fica no modo manual
-        lowercase_caracters = 'abcdefghijklmnopqrstuvwxyz'
-        uppercase_caracters = lowercase_caracters.upper()
-        special_caracters = "!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
-        numbers = '0123456789'
-
-        all_caracters = lowercase_caracters + uppercase_caracters + special_caracters + numbers
+        chars = string.ascii_letters + string.digits + string.punctuation
 
         # join() permite juntar todos os itens de um iterável e juntá-los em uma string
-        rpassword = ''.join(random.choices(all_caracters, k=20))
+        rpassword = ''.join(secrets.choice(chars) for _ in range(20))
 
         return rpassword
         
