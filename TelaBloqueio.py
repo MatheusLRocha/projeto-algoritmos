@@ -33,7 +33,7 @@ def TelaLogin(pm):
 
     # Procura na pasta do projeto pelo arquivo de autenticação para saber se houve já um cadastro feito
     for _, _, filenames in os.walk(os.getcwd()): # "_" indica uma variável descartável/ignorada, é usada quando o valor não será utilizado
-        if 'autenticacao.txt' in filenames:
+        if 'autenticacao.token' in filenames:
             isUser = True
             break
 
