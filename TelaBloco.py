@@ -84,26 +84,20 @@ def open_window(id, pm, title=None, password=None, on_close=None):
         new_block_passwd = Text(**sampletext)
         new_block_passwd.place(x=240, y=190)
 
+        def deletar_senha_antiga():
+            new_block_passwd.delete("1.0", "end-1c")
+            new_block_passwd.insert("1.0", pm.random_password())
 
         # Botão gerador de senhas
         new_generated = Button(text="Gerar senha aleatória",
                             **sampleh2,
-                            command=lambda:new_block_passwd.insert("1.0", pm.random_password()))
+                            command=lambda:deletar_senha_antiga())
         new_generated.place(x=150, y=270)
 
 
         # Separador 2
         sep2 = ttk.Separator(root, orient="horizontal")
         sep2.place(x=0, y=350, width=1200)
-
-
-        # Notas
-        new_notes = Label(text="Notas:",
-                        **sampleh1)
-        new_notes.place(x=50, y=380)
-        # Notas criadas
-        new_block_notes = Text(**sampletext2)
-        new_block_notes.place(x=240, y=382)
 
     else:
 
@@ -148,20 +142,10 @@ def open_window(id, pm, title=None, password=None, on_close=None):
         sep2.place(x=0, y=350, width=1200)
 
 
-        # Notas
-        new_notes = Label(text="Notas:",
-                        **sampleh1)
-        new_notes.place(x=50, y=380)
-        # Notas criadas
-        new_block_notes = Text(**sampletext2)
-        new_block_notes.insert("1.0",f"Anotações pré-selecionadas do bloco {id}")
-        new_block_notes.place(x=240, y=382)
-
     # Função alteradora de mudanças e volta para a tela principal
     def accept_changes(id=None):
             new_title = new_block_title.get("1.0", "end-1c")
             new_password = new_block_passwd.get("1.0", "end-1c")
-            variavel_notas = new_block_notes.get("1.0", "end-1c")
 
             if id is not None:
                 pm.update_password(id, new_password)
