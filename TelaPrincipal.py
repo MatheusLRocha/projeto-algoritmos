@@ -180,13 +180,15 @@ def abrir_tela(pm):
     # Prepara a instanciação das senhas
     encrypted_passwords = pm.show_passwords()
     space=0
-    for item in encrypted_passwords:
-        title = item.title
-        encrypted_password = item.password
 
-        decrypt_title = pm.fernet.decrypt(title.encode()).decode()
+    if encrypted_passwords is not None:
+        for item in encrypted_passwords:
+            title = item.title
+            encrypted_password = item.password
 
-        card(item.id, decrypt_title, encrypted_password)
-        space+=130
+            decrypt_title = pm.fernet.decrypt(title.encode()).decode()
+
+            card(item.id, decrypt_title, encrypted_password)
+            space+=130
 
     root.mainloop()

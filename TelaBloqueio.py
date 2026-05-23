@@ -1,5 +1,5 @@
 from tkinter import *
-from PasswordBank import Authenticantion
+from PasswordBank import Authentication
 
 def TelaLogin(pm):
 
@@ -29,7 +29,7 @@ def TelaLogin(pm):
 
 
     # .exists() retorna True se já houver uma linha de autenticação salva na tabela
-    isUser = Authenticantion.select().exists()
+    isUser = Authentication.select().exists()
 
     if isUser == True:
         passw = Label(root,

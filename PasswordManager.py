@@ -1,4 +1,4 @@
-from PasswordBank import PasswordRepository, Authenticantion
+from PasswordBank import PasswordRepository, Authentication
 import base64 # Mexe com codificação e decodificação de dados
 import os # Mexe com arquivos e diretórios
 from cryptography.fernet import Fernet, InvalidToken # Criptografia simétrica, cria uma chave para descriptografar e criptografar dados
@@ -39,32 +39,33 @@ class PasswordService:
         key = self.generate_key(passphrase, salt)
         self.fernet = Fernet(key)
 
-        safe_text = self.fernet.encrypt(b"Cofre criado").decode("utf-8")
+        safe_text = self.fernet.encrypt(b"Cofre criado").decode()
 
         try:
             #Apaga qualquer configuração de autenticação antiga se existir
-            Authenticantion.delete().execute()
+            self.banco.new_auth()
 
             # Deleta as senhas da conta antiga e cria uma nova tabela de senhas
             self.banco.new_register()
 
-            Authenticantion.create(
-                salt=salt,
-                auth=safe_text
-            )
+            # Cria no banco o registro do salt e do token de segurança já criptografados
+            self.banco.add_auth(salt, safe_text)
+
             print("Conta criada com sucesso")
+
             self.isLogged = True
-        except:
+        except OperationalError:
             print("Erro ao acessar o banco de dados")
-            self.isLogged = False
 
     # Verifica se o usuário tem uma conta
     def login_account(self, master_password):
         try:
-            
-            configuracao = Authenticantion.get() # Busca o registro de configuração salvo na tabela de Autenticação
-            salt = bytes(configuracao.salt)
-            encrypted_data = configuracao.auth.encode("utf-8")
+            # Busca o registro de configuração salvo na tabela de Autenticação
+            auth_settings = Authentication.get()
+
+            salt = bytes(auth_settings.salt)
+
+            encrypted_data = auth_settings.auth 
         except DoesNotExist:
             print("Nenhuma conta configurada encontrada")
             self.isLogged = False
@@ -79,7 +80,7 @@ class PasswordService:
                     self.fernet = Fernet(key)
 
                     # Descriptografa a autenticação para verificar se a senha mestre está correta
-                    self.fernet.decrypt(encrypted_data)
+                    self.fernet.decrypt(encrypted_data.encode())
             except InvalidToken: 
                     # InvalidToken ocorre quando ao tentar gerar a chave e abrir o cofre, o valor passado não é o mesmo que foi usado para criá-la
                 print('Chave inválida, erro ao tentar descriptografar com a senha passada!')
