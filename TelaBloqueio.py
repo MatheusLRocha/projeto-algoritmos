@@ -1,5 +1,5 @@
 from tkinter import *
-import os
+from PasswordBank import Authenticantion
 
 def TelaLogin(pm):
 
@@ -28,14 +28,8 @@ def TelaLogin(pm):
     pasSword.place(x=90,y=100) # Posicionamento do título
 
 
-    # Seleciona se é um usuário primário ou já cadastrado
-    isUser = False
-
-    # Procura na pasta do projeto pelo arquivo de autenticação para saber se houve já um cadastro feito
-    for _, _, filenames in os.walk(os.getcwd()): # "_" indica uma variável descartável/ignorada, é usada quando o valor não será utilizado
-        if 'autenticacao.token' in filenames:
-            isUser = True
-            break
+    # .exists() retorna True se já houver uma linha de autenticação salva na tabela
+    isUser = Authenticantion.select().exists()
 
     if isUser == True:
         passw = Label(root,
