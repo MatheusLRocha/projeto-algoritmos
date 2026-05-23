@@ -163,6 +163,10 @@ def abrir_tela(pm):
         # Função de deletar
         def delete_card(id):
             pm.delete_password(id)
+
+            # Destroi a janela e recria ela(mudar para uma função melhor do que isso se tiver)
+            root.destroy()
+            abrir_tela(pm)
             
         # Bloco de deletar
         delete_card_block = Button(root,
