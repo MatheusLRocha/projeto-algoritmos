@@ -4,11 +4,17 @@ from peewee import *
 # Cria o banco de dados utilizando o SQLite
 db = SqliteDatabase('passwords.db') # Gera um arquivo para armazenar o banco de dados
 
-# Cria a tabela que irá armazenar as senhas
-class Password(Model): # Model é a classe base do peewee para criar tabelas
-    title = CharField()
-    password = TextField()
-
+#Modelo base para todas as tabelar herdarem a mesma configuração de banco
+class BaseModel(Model):
     # Classe Meta para configurar a tabela
     class Meta:
         database = db # Define o banco de dados a ser utilizado
+
+# Cria a tabela que irá armazenar as senhas
+class Password(BaseModel): # Model é a classe base do peewee para criar tabelas
+    title = CharField()
+    password = TextField()
+
+class Authenticantion(BaseModel):
+    salt = BlobField()
+    auth = CharField(max_length=255)

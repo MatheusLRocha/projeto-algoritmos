@@ -1,4 +1,4 @@
-from PasswordBank import PasswordRepository
+from PasswordBank import PasswordRepository, Authenticantion
 import base64 # Mexe com codificação e decodificação de dados
 import os # Mexe com arquivos e diretórios
 from cryptography.fernet import Fernet, InvalidToken # Criptografia simétrica, cria uma chave para descriptografar e criptografar dados
@@ -39,59 +39,58 @@ class PasswordService:
         key = self.generate_key(passphrase, salt)
         self.fernet = Fernet(key)
 
-        # Deleta as senhas da conta antiga e cria uma nova tabela de senhas
-        self.banco.new_register()
+        safe_text = self.fernet.encrypt(b"Cofre criado").decode("utf-8")
 
-        # Cria um arquivo para salvar o salt e outro para salvar a senha criptografada de autenticação
-        with open('salt.bin', 'wb') as f: # .bin indica que é conteúdo binário
-            f.write(salt)
+        try:
+            #Apaga qualquer configuração de autenticação antiga se existir
+            Authenticantion.delete().execute()
 
-        with open('autenticacao.token', 'wb') as f: # .token indica que é conteúdo de autenticação
-            safe_text = self.fernet.encrypt(b'Cofre criado')
-            f.write(safe_text)
+            # Deleta as senhas da conta antiga e cria uma nova tabela de senhas
+            self.banco.new_register()
 
-        print('Conta criada com sucesso!')
-
-        # Após criar a conta, o usuário já está logado
-        self.isLogged = True
+            Authenticantion.create(
+                salt=salt,
+                auth=safe_text
+            )
+            print("Conta criada com sucesso")
+            self.isLogged = True
+        except:
+            print("Erro ao acessar o banco de dados")
+            self.isLogged = False
 
     # Verifica se o usuário tem uma conta
     def login_account(self, master_password):
         try:
-            # Pega o salt armazenado
-            with open('salt.bin', 'rb') as f:
-                salt = f.read()
-        except FileNotFoundError:
-            print('Arquivo de salt não encontrado')
+            
+            configuracao = Authenticantion.get() # Busca o registro de configuração salvo na tabela de Autenticação
+            salt = bytes(configuracao.salt)
+            encrypted_data = configuracao.auth.encode("utf-8")
+        except DoesNotExist:
+            print("Nenhuma conta configurada encontrada")
+            self.isLogged = False
+        except OperationalError:
+            print("Erro ao ler a tabela de Autenticação")
             self.isLogged = False
         else:
-            try:
-                # Pega a autenticação criptografada armazenada
-                with open('autenticacao.token', 'rb') as f:
-                    encrypted_data = f.readline()
-            except FileNotFoundError:
-                print('Arquivo de autenticação não encontrado')
-                self.isLogged = False
-            else:
                 # Verifica se a senha está correta
-                try:
+            try:
                     # Gera a chave de criptografia a partir da senha mestre e do salt, e coloca ela no fernet
                     key = self.generate_key(master_password, salt)
                     self.fernet = Fernet(key)
 
                     # Descriptografa a autenticação para verificar se a senha mestre está correta
                     self.fernet.decrypt(encrypted_data)
-                except InvalidToken: 
+            except InvalidToken: 
                     # InvalidToken ocorre quando ao tentar gerar a chave e abrir o cofre, o valor passado não é o mesmo que foi usado para criá-la
-                    print('Chave inválida, erro ao tentar descriptografar com a senha passada!')
-                    sleep(3) # Temporizador de 3 segundos
-                    print('Login negado')
+                print('Chave inválida, erro ao tentar descriptografar com a senha passada!')
+                sleep(3) # Temporizador de 3 segundos
+                print('Login negado')
                     
-                    self.isLogged = False
-                else:
-                    print('Login feito com sucesso!')
+                self.isLogged = False
+            else:
+                print('Login feito com sucesso!')
 
-                    self.isLogged = True
+                self.isLogged = True
         return self.isLogged
 
     # Sai da conta e fecha o aplicativo
@@ -167,10 +166,10 @@ if __name__ == '__main__':
             case 1:
                 senha = input('Digite uma senha segura: ')
 
-                pm.criar_conta(senha)
+                pm.create_account(senha)
             case 2:
                 senha = input('Digite sua senha: ')
-                pm.login_conta(senha)
+                pm.login_account(senha)
             case 3:
                 site = input('Nome do site: ')
                 senha = input('Senha que será salva: ')
