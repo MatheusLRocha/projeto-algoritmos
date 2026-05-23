@@ -63,8 +63,10 @@ class PasswordService:
             # Busca o registro de configuração salvo na tabela de Autenticação
             auth_settings = Authentication.get()
 
+            # Pega salt armazenado no registro
             salt = bytes(auth_settings.salt)
 
+            # Pega o toke de autenticação armazenado no registro
             encrypted_data = auth_settings.auth 
         except DoesNotExist:
             print("Nenhuma conta configurada encontrada")
@@ -73,7 +75,6 @@ class PasswordService:
             print("Erro ao ler a tabela de Autenticação")
             self.isLogged = False
         else:
-                # Verifica se a senha está correta
             try:
                     # Gera a chave de criptografia a partir da senha mestre e do salt, e coloca ela no fernet
                     key = self.generate_key(master_password, salt)
@@ -82,7 +83,7 @@ class PasswordService:
                     # Descriptografa a autenticação para verificar se a senha mestre está correta
                     self.fernet.decrypt(encrypted_data.encode())
             except InvalidToken: 
-                    # InvalidToken ocorre quando ao tentar gerar a chave e abrir o cofre, o valor passado não é o mesmo que foi usado para criá-la
+                # InvalidToken ocorre quando ao tentar gerar a chave e abrir o cofre, o valor passado não é o mesmo que foi usado para criá-la
                 print('Chave inválida, erro ao tentar descriptografar com a senha passada!')
                 sleep(3) # Temporizador de 3 segundos
                 print('Login negado')
