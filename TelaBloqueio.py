@@ -1,8 +1,7 @@
 from tkinter import *
 from PasswordBank import Authentication
 
-#def reopen(isUser):
-def TelaLogin(pm):
+def TelaLogin(pm, user_register=False):
 
         root = Tk() # Base TkInter
         root.overrideredirect(False) # Não brinque com isso (impede que a janela seja redimensionada, movida ou fechada)
@@ -30,8 +29,9 @@ def TelaLogin(pm):
 
         # .exists() retorna True se já houver uma linha de autenticação salva na tabela
         isUser = Authentication.select().exists()
+        new_register = user_register
 
-        if isUser == True:
+        if isUser == True and new_register == False:
             passw = Label(root,
                         text="Senha",
                         font=("Montserrat",22,"bold"),
@@ -68,16 +68,14 @@ def TelaLogin(pm):
                     error.place(x=190,y=500) # Posicionamento do texto de erro
 
             def new_login():
-                #isUser = False
-                #root.destroy();
-                #reopen(isUser);
-                return;
+                new_register = True
+                root.destroy()
+                TelaLogin(pm, new_register)
 
 
 
             def sure():
-
-                sure = Tk();
+                sure = Tk()
                 sure.title("Tem certeza?") # Título da janela
                 sure.geometry("600x200") # Dimensões da janela
                 sure.resizable(False, False) # Impede a redimensionalização da janela
@@ -87,7 +85,7 @@ def TelaLogin(pm):
                                 font=("Montserrat",20,"bold"),
                                 fg="#990c0c", # Cor do texto do erro
                                 bg="#a8c7e4")
-                sure_label.pack(pady=10); # Posicionamento do texto de erro
+                sure_label.pack(pady=10) # Posicionamento do texto de erro
 
 
                 new_login_button = Button(sure,
