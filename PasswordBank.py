@@ -5,7 +5,7 @@ class PasswordRepository:
         db.connect() # Conecta ao banco de dados
         db.create_tables([Password, Authentication]) # Cria as tabelas no banco de dados, caso ela ainda não exista
 
-    # CRUD(Create, Read, Update, Delete) para manipular os dados do banco de dados utilizando a classe Password
+    # CRUD(Create, Read, Update, Delete) para manipular os dados do banco de dados
 
     # Create
     def add(self, title, password):
