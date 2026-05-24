@@ -48,7 +48,7 @@ def TelaLogin(pm, user_register=False):
             user_passw.place(x=70,y=450) # Posicionamento do campo de entrada para a senha
 
 
-            # Funções
+            # Função de conferir no banco de dados a senha de entrada correta
             def login():
 
                 if pm.login_account(user_passw.get()): # Verifica se o usuário e a senha estão corretos (nesse caso, ambos são "admin")
@@ -67,35 +67,42 @@ def TelaLogin(pm, user_register=False):
                                 bg="#0c809f")
                     error.place(x=190,y=500) # Posicionamento do texto de erro
 
-            def new_login():
-                new_register = True
-                root.destroy()
-                TelaLogin(pm, new_register)
-
+            # Funções de criar novo usuário com confirmação de exclusão do que já existe
+            
             def sure():
-                sure = Tk()
-                sure.title("Tem certeza?") # Título da janela
-                sure.geometry("600x200") # Dimensões da janela
-                sure.resizable(False, False) # Impede a redimensionalização da janela
-                sure.config(bg="#a8c7e4") # Cor de fundo da janela
-                sure_label = Label(sure,
+                def new_login():
+                    new_register = True
+                    root.destroy()
+                    sure_window.destroy()
+                    TelaLogin(pm, new_register)
+                
+                sure_window = Tk()
+                sure_window.title("Tem certeza?") # Título da janela
+                sure_window.geometry("600x200") # Dimensões da janela
+                sure_window.resizable(False, False) # Impede a redimensionalização da janela
+                sure_window.config(bg="#a8c7e4") # Cor de fundo da janela
+                sure_label = Label(sure_window,
                                 text="Tem certeza que deseja criar outro usuário?\nIsso apagará todos os seus dados atuais...", # Texto do erro
                                 font=("Montserrat",20,"bold"),
                                 fg="#990c0c", # Cor do texto do erro
                                 bg="#a8c7e4")
                 sure_label.pack(pady=10) # Posicionamento do texto de erro
-
-
-                new_login_button = Button(sure,
-                                text="Sim",
-                                font=("Montserrat",26,"bold"),
-                                bg="#990c0c",
-                                fg="#a8c7e4",
-                                borderwidth=2,
-                                command=new_login)
+                new_login_button = Button(sure_window,
+                                    text="Sim",
+                                    font=("Montserrat",26,"bold"),
+                                    bg="#990c0c",
+                                    fg="#a8c7e4",
+                                    borderwidth=2,
+                                    command=new_login)
                 new_login_button.pack(pady=10) # Posicionamento do botão de login
+
+                
+
+
+                    
             
-            # Botões
+            
+            # Botão de login de usuário já existente
             login_button = Button(root,
                                 text="Login",
                                 font=("Montserrat",20,"bold"),
@@ -103,9 +110,9 @@ def TelaLogin(pm, user_register=False):
                                 fg="#0c809f",
                                 borderwidth=2,
                                 command=login)
-            login_button.place(x=245,y=570) # Posicionamento do botão de login
+            login_button.place(x=245,y=570)
 
-
+            # Botão de indício de criação de novo usuário
             sure_new_button = Button(root,
                                 text="Novo usuário",
                                 font=("Montserrat",20,"bold"),
@@ -113,7 +120,7 @@ def TelaLogin(pm, user_register=False):
                                 fg="#990c0c",
                                 borderwidth=2,
                                 command=sure)
-            sure_new_button.place(x=197,y=680) # Posicionamento do botão de login
+            sure_new_button.place(x=197,y=680)
 
         else:
             # Texto da nova senha
