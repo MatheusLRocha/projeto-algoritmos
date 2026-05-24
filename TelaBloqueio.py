@@ -72,8 +72,6 @@ def TelaLogin(pm, user_register=False):
                 root.destroy()
                 TelaLogin(pm, new_register)
 
-
-
             def sure():
                 sure = Tk()
                 sure.title("Tem certeza?") # Título da janela

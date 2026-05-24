@@ -39,11 +39,12 @@ class PasswordService:
         key = self.generate_key(passphrase, salt)
         self.fernet = Fernet(key)
 
-        safe_text = self.fernet.encrypt(b"Cofre criado").decode()
+        # Gera um token de autenticação aleatório para verificar usuário
+        safe_token = self.fernet.encrypt(secrets.token_bytes(32)).decode()
 
         try:
             # Apaga qualquer configuração de autenticação antiga se existir e...
-            self.banco.new_auth(salt, safe_text) # Cria no banco o registro do salt e do token de segurança já criptografados
+            self.banco.new_auth(salt, safe_token) # Cria no banco o registro do salt e do token de segurança já criptografados
 
             # Deleta as senhas da conta antiga e cria uma nova tabela de senhas
             self.banco.new_register()
@@ -63,7 +64,7 @@ class PasswordService:
             # Pega salt armazenado no registro
             salt = bytes(auth_settings.salt)
 
-            # Pega o toke de autenticação armazenado no registro
+            # Pega o token de autenticação armazenado no registro
             encrypted_data = auth_settings.auth 
         except DoesNotExist:
             print("Nenhuma conta configurada encontrada")
@@ -73,12 +74,12 @@ class PasswordService:
             self.isLogged = False
         else:
             try:
-                    # Gera a chave de criptografia a partir da senha mestre e do salt, e coloca ela no fernet
-                    key = self.generate_key(master_password, salt)
-                    self.fernet = Fernet(key)
+                # Gera a chave de criptografia a partir da senha mestre e do salt, e coloca ela no fernet
+                key = self.generate_key(master_password, salt)
+                self.fernet = Fernet(key)
 
-                    # Descriptografa a autenticação para verificar se a senha mestre está correta
-                    self.fernet.decrypt(encrypted_data.encode())
+                # Tenta descriptografar a autenticação para verificar se a senha mestre está correta
+                self.fernet.decrypt(encrypted_data.encode())
             except InvalidToken: 
                 # InvalidToken ocorre quando ao tentar gerar a chave e abrir o cofre, o valor passado não é o mesmo que foi usado para criá-la
                 print('Chave inválida, erro ao tentar descriptografar com a senha passada!')
@@ -90,6 +91,7 @@ class PasswordService:
                 print('Login feito com sucesso!')
 
                 self.isLogged = True
+
         return self.isLogged
 
     # Sai da conta e fecha o aplicativo
@@ -147,47 +149,3 @@ class PasswordService:
         rpassword = ''.join(secrets.choice(chars) for _ in range(20))
 
         return rpassword
-        
-
-
-
-if __name__ == '__main__':
-    # Instancia o gerenciador de senhas para acessar as funções de login e gerenciamento de senhas
-    banco = PasswordRepository()
-    pm = PasswordService(banco)
-
-    while True:
-        print('(1) Criar conta\n(2) Entrar na conta\n(3) Criar nova senha\n(4) Ver senhas\n(5) Deletar\n(6) Atualizar Senha\n(7) Sair')
-
-        opcao = int(input('Escolha uma opção: '))
-
-        match(opcao):
-            case 1:
-                senha = input('Digite uma senha segura: ')
-
-                pm.create_account(senha)
-            case 2:
-                senha = input('Digite sua senha: ')
-                pm.login_account(senha)
-            case 3:
-                site = input('Nome do site: ')
-                senha = input('Senha que será salva: ')
-
-                pm.new_password(site, senha)
-            case 4:
-                pm.show_passwords()
-            case 5:
-                site = input('Nome do site: ')
-
-                pm.delete_password(site)
-            case 6:
-                site = input('Site que deseja alterar a senha: ')
-                senha = input('Nova senha: ')
-
-                pm.update_password(site, senha)
-            case 7:
-                print('Saindo...')
-                pm.sair_conta()
-                break
-            case _:
-                print('Valor inválido')
