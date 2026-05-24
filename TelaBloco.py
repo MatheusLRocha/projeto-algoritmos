@@ -147,10 +147,14 @@ def open_window(id, pm, title=None, password=None, on_close=None):
             new_title = new_block_title.get("1.0", "end-1c")
             new_password = new_block_passwd.get("1.0", "end-1c")
 
-            if id is not None:
-                pm.update_password(id, new_password)
+            if ((len(new_title) != 0) and len(new_password) != 0):
+                if id is not None:
+                    pm.update_password(id, new_password)
+                else:
+                    pm.new_password(new_title, new_password)   
             else:
-                pm.new_password(new_title, new_password)    
+                print('Título e senha devem ser preenchidos')
+                return 
             
             root.destroy()
             if callable(on_close):
