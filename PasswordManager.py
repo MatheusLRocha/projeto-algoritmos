@@ -42,14 +42,11 @@ class PasswordService:
         safe_text = self.fernet.encrypt(b"Cofre criado").decode()
 
         try:
-            #Apaga qualquer configuração de autenticação antiga se existir
-            self.banco.new_auth()
+            # Apaga qualquer configuração de autenticação antiga se existir e...
+            self.banco.new_auth(salt, safe_text) # Cria no banco o registro do salt e do token de segurança já criptografados
 
             # Deleta as senhas da conta antiga e cria uma nova tabela de senhas
             self.banco.new_register()
-
-            # Cria no banco o registro do salt e do token de segurança já criptografados
-            self.banco.add_auth(salt, safe_text)
 
             print("Conta criada com sucesso")
 

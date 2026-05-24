@@ -33,9 +33,6 @@ class PasswordRepository:
         Password.delete().execute()
 
     # Deleta completamente a autenticação e o salt para criar uma nova de acordo com o cadastro
-    def new_auth(self):
+    def new_auth(self, salt, safe_token):
         Authentication.delete().execute()
-
-    # Adiciona o salt e o token de segurança para entrar na conta
-    def add_auth(self, salt, safe_token):
         Authentication.create(salt=salt, auth=safe_token)
