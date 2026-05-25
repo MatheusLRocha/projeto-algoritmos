@@ -11,14 +11,14 @@ def TelaLogin(pm, user_register=False):
         root.resizable(False, False) # Impede a redimensionalização da janela
         root.config(bg="#0c809f") # Cor de fundo da janela
 
-        # Textos
+        # Texto do subtexto acima do título
         preSword = Label(root,
                         text="Corte todos os riscos de roubo de senhas com o", # Texto do subtítulo
                         font=("Montserrat",15,"bold"), # Fonte, tamanho da fonte e estilo do subtítulo
                         bg="#0c809f")
         preSword.place(x=65,y=30) # Posicionamento do subtítulo
 
-
+        # Texto do título
         pasSword = Label(root,
                         text="PasSword!",
                         font=("Montserrat",60,"underline","bold"),
@@ -31,6 +31,7 @@ def TelaLogin(pm, user_register=False):
         isUser = Authentication.select().exists()
         new_register = user_register
 
+        # Sequência de confirmação de existência de um banco de dados do usuário
         if isUser == True and new_register == False:
             passw = Label(root,
                         text="Senha",
@@ -38,8 +39,7 @@ def TelaLogin(pm, user_register=False):
                         bg="#0c809f")
             passw.place(x=245,y=400) # Posicionamento do texto do campo de senha
 
-            # Campos de entrada
-
+            # Campo de entrada da senha
             user_passw = Entry(root,
                             font=("Montserrat",20),
                             width=30,
@@ -95,11 +95,6 @@ def TelaLogin(pm, user_register=False):
                                     borderwidth=2,
                                     command=new_login)
                 new_login_button.pack(pady=10) # Posicionamento do botão de login
-
-                
-
-
-                    
             
             
             # Botão de login de usuário já existente
