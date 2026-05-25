@@ -62,11 +62,11 @@ def open_window(id, pm, title=None, password=None, on_close=None):
             }
     if (id==None):
 
-        # Titulos
+        # Texto da entrada do título
         new_title = Label(text="Título:",
                             **sampleh1)
         new_title.place(x=30, y=50)
-        # Título criado
+        # Entrada do título criado
         new_block_title = Text(**sampletext)
         new_block_title.place(x=220, y=50)
 
@@ -76,11 +76,11 @@ def open_window(id, pm, title=None, password=None, on_close=None):
         sep1.place(x=0, y=145, width=1200)
 
 
-        # Senhas
+        # Texto de entrada para a senha
         new_passwd = Label(text="Senha:",
                         **sampleh1)
         new_passwd.place(x=50, y=190)
-        # Senha criada
+        # Entrada para a senha criada
         new_block_passwd = Text(**sampletext)
         new_block_passwd.place(x=240, y=190)
 
@@ -101,11 +101,11 @@ def open_window(id, pm, title=None, password=None, on_close=None):
 
     else:
 
-        # Titulos
+        # Texto da entrada do título
         new_title = Label(text="Título:",
                             **sampleh1)
         new_title.place(x=30, y=50)
-        # Título criado
+        # Entrada do título criado
         new_block_title = Text(**sampletext2)
         new_block_title.insert("1.0",f"{title}")
         new_block_title.place(x=220, y=50)
@@ -117,11 +117,11 @@ def open_window(id, pm, title=None, password=None, on_close=None):
 
         decrypted_password = pm.fernet.decrypt(password.encode()).decode()
 
-        # Senhas
+        # Texto de entrada para a senha
         new_passwd = Label(text="Senha:",
                         **sampleh1)
         new_passwd.place(x=50, y=190)
-        # Senha criada
+        # Entrada para a senha criada
         new_block_passwd = Text(**sampletext2)
         new_block_passwd.insert("1.0",f"{decrypted_password}")
         new_block_passwd.place(x=240, y=190)
@@ -163,7 +163,7 @@ def open_window(id, pm, title=None, password=None, on_close=None):
                 except Exception:
                     pass
 
-    # Botão de alterar mudanças
+    # Botão de aceitar mudanças
     accept_changes_button = Button(root,
                                 text="Alterar bloco",
                                 **samplebutton,

@@ -74,18 +74,18 @@ def abrir_tela(pm):
     }
 
 
-    # Configuração do Canvas e Frames para Scrollbar funcional dos blocos
+    # Configuração do Canvas e Quadros para Scrollbar funcional dos blocos
     root.grid_rowconfigure(0, weight=1)
     root.grid_columnconfigure(0, weight=1)
 
-    # Frame base para a divisão da tela principal em frame esquerdo e direito
+    # Quadro base para a divisão da tela principal em quadros esquerdo e direito
     main_frame = Frame(root, bg="#0c809f")
     main_frame.grid(row=0, column=0, sticky="nsew")
     main_frame.grid_rowconfigure(0, weight=1)
     main_frame.grid_columnconfigure(0, weight=1)
     main_frame.grid_columnconfigure(1, weight=0)
 
-    # Frame esquerdo responsável pelo Scrollbar e a funcionalidade dos blocos a partir do Canvas
+    # Quadro esquerdo responsável pelo Scrollbar e a funcionalidade dos blocos a partir do Canvas
     left_frame = Frame(main_frame, bg="#0c809f")
     left_frame.grid(row=0, column=0, sticky="nsew", padx=0, pady=5)
     left_frame.grid_rowconfigure(0, weight=1)
@@ -117,7 +117,7 @@ def abrir_tela(pm):
 
 
 
-    # Frame direito para a descrição dos blocos
+    # Quadro direito para a descrição dos blocos
     right_frame = Frame(main_frame, bg="#0c809f")
     right_frame.grid(row=0, column=2, sticky="nsew", padx=(0, 20), pady=20)
     right_frame.grid_rowconfigure(2, weight=1)
@@ -138,14 +138,18 @@ def abrir_tela(pm):
     anotacao = Text(right_frame, **sampleh2)
     anotacao.grid(row=2, column=0, sticky="nsew", pady=(10, 0), padx=(20,0))
 
+
+    # Função que abre a janela de criação de um bloco novo
     def add_card():
         root.destroy()
         open_window(None, pm, None, None, lambda: abrir_tela(pm))
 
+    # Função que abre a janela de edição de um bloco pré-existente
     def change_card(id, title, password):
         root.destroy()
         open_window(id, pm, title, password, lambda: abrir_tela(pm))
 
+    # Função que adiciona as informações ao quadro de detalhes do bloco
     def mostrar_detalhe(title, encrypted_password):
         senha = pm.fernet.decrypt(encrypted_password.encode()).decode()
         root.clipboard_clear()
@@ -201,6 +205,7 @@ def abrir_tela(pm):
 
         card_row += 1
 
+    # Função de deletar o bloco selecionado e recarregar a página
     def delete_card(id):
         pm.delete_password(id)
         root.destroy()
@@ -208,6 +213,7 @@ def abrir_tela(pm):
 
     encrypted_passwords = pm.show_passwords()
 
+    # Sequência lógica de confirmação de existência e seleção dos blocos do usuário
     if encrypted_passwords is not None:
         for item in encrypted_passwords:
             title = item.title
