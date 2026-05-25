@@ -17,4 +17,4 @@ python main.py
 
 Se tudo ocorrer bem, você já estará executando o projeto perfeitamente!
 
-Na sua primeira sessão, um cadastro deverá ser feito para que os arquivos necessários sejam criados.
+A senha para acesso é admin.
